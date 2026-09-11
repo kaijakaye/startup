@@ -2,7 +2,7 @@
 
 [My Notes](notes.md)
 
-This application will track reading between friends. A user can use the ShelfLife app to keep track of books they are currently reading, books on their to be read list, goals they have for how much they want to read every day, and progress they are making on their current read. Additionally, friends can read books together and keep track of each other's progress to stay accountable to their reading goals.
+This application will track reading between friends. A user can use the ShelfLife app to keep track of books they are currently reading, books on their to be read list, goals they have for how much they want to read every day, and progress they are making on their current read. Additionally, friends can read books together and keep track of each other's progress to stay accountable to their reading goals. The Open Library API will be used to retrieve book information and cover images.
 
 ### Elevator pitch
 
@@ -32,6 +32,8 @@ I am going to use the required technologies in the following ways.
 - **Service** - Backend service with endpoints for login, retrieving friends' progress, updating user's progress, and updating goals.
 - **DB/Login** - Store users, booklists, goals, and friends lists in database. Register and login users. Credentials securely stored in database. Cannot update booklist or progress unless authenticated.
 - **WebSocket** - As each user updates their progress on a given book, their progress is updated for each of their friends.
+- **3rd party API** - The 3rd party API I will be using is Open Library API to search and display book titles and covers.
+[Open Library API Link](https://openlibrary.org/developers/api)
 
 ## 🚀 Specification Deliverable
 
