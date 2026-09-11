@@ -12,20 +12,15 @@ In a world full of so many distractions and technological demands, reading is be
 
 ![Design image](design.JPG)
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-```mermaid
-sequenceDiagram
-    actor You
-    actor Website
-    You->>Website: Replace this with your design
-```
-
 ### Key features
 
-- Describe your key feature
-- Describe your key feature
-- Describe your key feature
+- Secure login over HTTPS
+- Ability for user to add new books to their bookshelf
+- User can create a to-read list and view which books they have already read in the year
+- User can select their current read and track their progress on it daily
+- Book club feature to track each friend's progress on the same book
+- Ability to update daily how many pages user has read
+- Goal section to track how many books the user wants to read in a year and how many days a month they want to read
 
 ### Technologies
 
