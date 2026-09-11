@@ -33,6 +33,7 @@ I am going to use the required technologies in the following ways.
 - **DB/Login** - Store users, booklists, goals, and friends lists in database. Register and login users. Credentials securely stored in database. Cannot update booklist or progress unless authenticated.
 - **WebSocket** - As each user updates their progress on a given book, their progress is updated for each of their friends.
 - **3rd party API** - The 3rd party API I will be using is Open Library API to search and display book titles and covers.
+
 [Open Library API Link](https://openlibrary.org/developers/api)
 
 ## 🚀 Specification Deliverable
