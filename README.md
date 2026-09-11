@@ -26,12 +26,12 @@ In a world full of so many distractions and technological demands, reading is be
 
 I am going to use the required technologies in the following ways.
 
-- **HTML** - Description here
-- **CSS** - Description here
-- **React** - Description here
-- **Service** - Description here
-- **DB/Login** - Description here
-- **WebSocket** - Description here
+- **HTML** - Uses correct HTML structure for application. One for login, one for homepage, potential sections for the year-to-date bookshelf, current book's tracking and progress, book club hub for friends' tracking progress, and goal page.
+- **CSS** - Application styling that looks good on different screen sizes, has colorful options for the various books on the bookshelf, and displays segments of the dashboard in a visually appealing way.
+- **React** - Provides login, book display, and use of React for inputting new books, selecting friends, and updating goals.
+- **Service** - Backend service with endpoints for login, retrieving friends' progress, updating user's progress, and updating goals.
+- **DB/Login** - Store users, booklists, goals, and friends lists in database. Register and login users. Credentials securely stored in database. Cannot update booklist or progress unless authenticated.
+- **WebSocket** - As each user updates their progress on a given book, their progress is updated for each of their friends.
 
 ## 🚀 Specification Deliverable
 
