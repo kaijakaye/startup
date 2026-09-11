@@ -2,17 +2,11 @@
 
 [My Notes](notes.md)
 
-This application will track reading between friends. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-> [!NOTE]
-> This is a template for your startup application. You must modify this `README.md` file for each phase of your development. You only need to fill in the section for each deliverable when that deliverable is submitted in Canvas. Without completing the section for a deliverable, the TA will not know what to look for when grading your submission. Feel free to add additional information to each deliverable description, but make sure you at least have the list of rubric items and a description of what you did for each item.
-
-> [!NOTE]
-> If you are not familiar with Markdown then you should review the [documentation](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax) before continuing.
+This application will track reading between friends. A user can use the ShelfLife app to keep track of books they are currently reading, books on their to be read list, goals they have for how much they want to read every day, and progress they are making on their current read. Additionally, friends can read books together and keep track of each other's progress to stay accountable to their reading goals.
 
 ### Elevator pitch
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+In a world full of so many distractions and technological demands, reading is becoming a lost art. Many of us want to be reading more frequently, but lack accountability or lose track of books that we've been wanting to read. Not anymore! Shelf Life is a reading tracker app that helps you track your reading goals, document which books you've read throughout the year, and compare your progress to your friends. It's like an online book club that can be as personal or as community-based as you want it to be.
 
 ### Design
 
