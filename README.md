@@ -1,4 +1,4 @@
-# Your startup name here
+# ShelfLife
 
 [My Notes](notes.md)
 
