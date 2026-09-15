@@ -54,9 +54,9 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [x] **Rented EC2 server** - I did not complete this part of the deliverable.
-- [x] **Leased domain name** - I did not complete this part of the deliverable.
-- [x] **Server accessible** from my domain: [https://shelflife.click](https://shelflife.click) - I did not complete this part of the deliverable.
+- [x] **Rented EC2 server** - I successfully launched an instance of an EC2 server and saved the private and public keys, also making sure to associate an elastic IP address with the domain.
+- [x] **Leased domain name** - I came up with and leased the domain name I want to use for this project.
+- [x] **Server accessible** from my domain: [https://shelflife.click](https://shelflife.click) - the server is accessible from this domain and is secured via Caddy.
 
 ## 🚀 HTML deliverable
 
