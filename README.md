@@ -62,16 +62,16 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
-- [ ] **HTML pages** - I did not complete this part of the deliverable.
-- [ ] **Proper HTML element usage** - I did not complete this part of the deliverable.
-- [ ] **Links** - I did not complete this part of the deliverable.
-- [ ] **Text** - I did not complete this part of the deliverable.
-- [ ] **3rd party API placeholder** - I did not complete this part of the deliverable.
-- [ ] **Images** - I did not complete this part of the deliverable.
-- [ ] **Login placeholder** - I did not complete this part of the deliverable.
-- [ ] **DB data placeholder** - I did not complete this part of the deliverable.
-- [ ] **WebSocket placeholder** - I did not complete this part of the deliverable.
+- [x] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
+- [x] **HTML pages** - I created individual HTML files corresponding to each of my website pages.
+- [x] **Proper HTML element usage** - I successfully incorporated headers, footers, main sections, and other HTML elements.
+- [x] **Links** - I included links to navigate between pages.
+- [x] **Text** - There is textual content on each page.
+- [x] **3rd party API placeholder** - There are placeholders for a 3rd party API book lookup.
+- [x] **Images** - I included an image of a sample book cover.
+- [x] **Login placeholder** - There are placeholder fields for where to login and register.
+- [x] **DB data placeholder** - There is a placeholder in the bookshelf HTML for where an example book in the database would be stored.
+- [x] **WebSocket placeholder** - There is placeholder text in place of where the WebSocket would bring in live data from friend activity and book clubs.
 
 ## 🚀 CSS deliverable
 
