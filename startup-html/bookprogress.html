@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book Progress</title>
+    <link rel="icon" href="favicon.ico" />
+  </head>
+  <body>
+    <header>
+      <h1>Shelf Life</h1>
+
+      <nav>
+        <menu>
+          <li><a href="index.html">Login</a></li>
+          <li><a href="dashboard.html">Dashboard</a></li>
+          <li><a href="bookshelf.html">Bookshelf</a></li>
+          <li><a href="bookbuzz.html">Book Buzz</a></li>
+          <li><a href="bookclub.html">Book Club</a></li>
+          <li><a href="bookprogress.html">Book Progress</a></li>
+        </menu>
+      </nav>
+
+      <hr />
+    </header>
+
+    <main>
+      <h2>Current Reads</h2>
+        <p>Track your progress on books you're currently reading</p>
+        <div class="columns">
+            <div class="column">
+                <h3>East of Eden</h3>
+                <p>John Steinbeck</p>
+                <p>Chapter 36 of 55</p>
+                <progress value="67" max="100"></progress>
+                <p>67% complete</p>
+                <form method="get" action="bookprogress.html">
+                    <label for="reading-progress">Update Progress:</label>
+                    <input type="number" id="reading-progress" name="reading-progress" min="0" max="100" value="67">
+                    <button type="submit">Update</button>
+                </form>
+            </div>
+
+            <div class="column">
+                <h3>Cinder</h3>
+                <p>Marissa Meyer</p>
+                <p>Chapter 12 of 35</p>
+                <progress value="34" max="100"></progress>
+                <p>34% complete</p>
+                <form method="get" action="bookprogress.html">
+                    <label for="reading-progress-2">Update Progress:</label>
+                    <input type="number" id="reading-progress-2" name="reading-progress-2" min="0" max="100" value="34">
+                    <button type="submit">Update</button>
+                </form>
+            </div>
+
+            <div class="column">
+                <h3>The Great Gatsby</h3>
+                <p>F. Scott Fitzgerald</p>
+                <p>Chapter 5 of 9</p>
+                <progress value="56" max="100"></progress>
+                <p>56% complete</p>
+                <form method="get" action="bookprogress.html">
+                    <label for="reading-progress-3">Update Progress:</label>
+                    <input type="number" id="reading-progress-3" name="reading-progress-3" min="0" max="100" value="56">
+                    <button type="submit">Update</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+      <hr />
+      <span class="text-reset">Author Name: Kaija Sorensen</span>
+      <br />
+      <a href="https://github.com/kaijakaye/startup">GitHub</a>
+    </footer>
+  </body>
+</html>
