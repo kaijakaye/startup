@@ -33,6 +33,7 @@ I am going to use the required technologies in the following ways.
 - **DB/Login** - Store users, booklists, goals, and friends lists in database. Register and login users. Credentials securely stored in database. Cannot update booklist or progress unless authenticated.
 - **WebSocket** - As each user updates their progress on a given book, their progress is updated for each of their friends.
 - **3rd party API** - The 3rd party API I will be using is Open Library API to search and display book titles and covers.
+
 [Open Library API Link](https://openlibrary.org/developers/api)
 
 ## 🚀 Specification Deliverable
@@ -53,9 +54,9 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] **Rented EC2 server** - I did not complete this part of the deliverable.
-- [ ] **Leased domain name** - I did not complete this part of the deliverable.
-- [ ] **Server accessible** from my domain: [https://yourdomainnamehere.click](https://yourdomainnamehere.click) - I did not complete this part of the deliverable.
+- [x] **Rented EC2 server** - I successfully launched an instance of an EC2 server and saved the private and public keys, also making sure to associate an elastic IP address with the domain.
+- [x] **Leased domain name** - I came up with and leased the domain name I want to use for this project.
+- [x] **Server accessible** from my domain: [https://shelflife.click](https://shelflife.click) - the server is accessible from this domain and is secured via Caddy.
 
 ## 🚀 HTML deliverable
 
