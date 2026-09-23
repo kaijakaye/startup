@@ -51,12 +51,18 @@
                 <p>Enter the title of a book to read as a group</p>
                 <form method="get" action="bookshelf.html">
                     <div>
-                    <input type="text" placeholder="Book Title" />
+                    <input type="text" placeholder="Search for a book title..." />
                     </div>
-                    <div>
-                    <input type="text" placeholder="Author Name" />
+                    <!-- 3rd PARTY API RESULTS WILL APPEAR HERE -->
+                    <div class="api-book-result">
+                        <!--<img src="https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1786033865i/9361589.jpg" width="100" alt="Book cover">-->
                     </div>
-                    <button type="submit">Add</button>
+                    <select id="options-clubs" name="options-clubs" placeholder="Select a book club group to read this with">
+                        <option value="Girlfriends">Girlfriends</option>
+                        <option value="Family">Family</option>
+                        <option value="Work Besties">Work Besties</option>
+                    </select><br>
+                    <button type="submit">Add to Book Club</button>
                 </form>
     </main>
 
