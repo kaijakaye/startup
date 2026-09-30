@@ -68,8 +68,7 @@ footer {
 
 menu {
   display: flex;
-  /*  overwrite Bootstrap so the menu does not wrap */
-  flex-direction: row !important;
+  flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
   gap: 1.5rem;
@@ -114,8 +113,24 @@ h3 {
     color: purple;
 }
 
+.columns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
 
-@media (max-height: 600px) {
+.column {
+  padding: 1rem;
+  text-align: center;
+  background-color: #fff8ed;
+  border: 2px solid #c49a6c;
+  border-radius: 10px;
+}
+
+@media (max-height: 600px), (max-width: 600px) {
   header {
     display: none;
   }
