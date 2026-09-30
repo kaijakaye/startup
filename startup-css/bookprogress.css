@@ -1,0 +1,92 @@
+progress {
+  width: 100%;
+  height: 1rem;
+  accent-color: #39824b;
+}
+
+h3 {
+    color: purple;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.column {
+  padding: 1rem;
+  text-align: center;
+  background-color: #fff8ed;
+  border: 2px solid #c49a6c;
+  border-radius: 10px;
+}
+
+.book-cover {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 155px;
+  min-height: 220px;
+  margin: 0 auto 1rem;
+  padding: 1rem;
+  color: white;
+  border-radius: 4px 10px 10px 4px;
+  border-left: 10px solid rgb(0 0 0 / 25%);
+  box-shadow: 4px 5px 8px rgb(0 0 0 / 30%);
+  overflow: hidden;
+}
+
+/* Decorative line that makes the cover look like a book spine */
+.book-cover::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 18px;
+  width: 2px;
+  background-color: rgb(255 255 255 / 35%);
+}
+
+.book-cover h3 {
+  position: relative;
+  margin: 2rem 0;
+  color: white;
+  font-family: "Carter One", system-ui;
+  font-size: 1.25rem;
+}
+
+.book-author {
+  position: relative;
+  margin: 0;
+  color: white;
+  font-style: italic;
+}
+
+.book-label {
+  position: relative;
+  font-size: 0.65rem;
+  letter-spacing: 0.08rem;
+  font-weight: bold;
+}
+
+/* Book colors */
+.book-cover--blue {
+  background: linear-gradient(135deg, #3973a8, #83c5e8);
+}
+
+.book-cover--green {
+  background: linear-gradient(135deg, #39824b, #9bd36b);
+}
+
+.book-cover--pink {
+  background: linear-gradient(135deg, #d85c91, #ffb6d2);
+}
+
+.book-cover--purple {
+  background: linear-gradient(135deg, #70458f, #c49ade);
+}

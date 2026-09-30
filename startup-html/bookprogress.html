@@ -14,6 +14,7 @@
       crossorigin="anonymous"
     />
     <link rel="stylesheet" href="../startup-css/main.css" />
+    <link rel="stylesheet" href="../startup-css/bookprogress.css" />
   </head>
   <body>
     <header>
@@ -38,42 +39,78 @@
         <p>Track your progress on books you're currently reading</p>
         <div class="columns">
             <div class="column">
+              <div class="book-cover book-cover--blue">
+                <span class="book-label">CURRENTLY READING</span>
                 <h3>East of Eden</h3>
-                <p>John Steinbeck</p>
-                <p>Chapter 36 of 55</p>
-                <progress value="67" max="100"></progress>
-                <p>67% complete</p>
-                <form method="get" action="bookprogress.html">
-                    <label for="reading-progress">Update Progress:</label>
-                    <input type="number" id="reading-progress" name="reading-progress" min="0" max="100" value="67">
-                    <button type="submit">Update</button>
-                </form>
+                <p class="book-author">John Steinbeck</p>
+              </div>
+
+              <p>Chapter 36 of 55</p>
+              <progress value="67" max="100"></progress>
+              <p>67% complete</p>
+
+              <form method="get" action="bookprogress.html">
+                <label for="reading-progress">Update Progress:</label>
+                <input
+                  type="number"
+                  id="reading-progress"
+                  name="reading-progress"
+                  min="0"
+                  max="100"
+                  value="67"
+                />
+                <button class="btn btn-success" type="submit">Update</button>
+              </form>
             </div>
 
             <div class="column">
+              <div class="book-cover book-cover--green">
+                <span class="book-label">CURRENTLY READING</span>
                 <h3>Cinder</h3>
-                <p>Marissa Meyer</p>
-                <p>Chapter 12 of 35</p>
-                <progress value="34" max="100"></progress>
-                <p>34% complete</p>
-                <form method="get" action="bookprogress.html">
-                    <label for="reading-progress-2">Update Progress:</label>
-                    <input type="number" id="reading-progress-2" name="reading-progress-2" min="0" max="100" value="34">
-                    <button type="submit">Update</button>
-                </form>
+                <p class="book-author">Marissa Meyer</p>
+              </div>
+
+              <p>Chapter 12 of 35</p>
+              <progress value="34" max="100"></progress>
+              <p>34% complete</p>
+
+              <form method="get" action="bookprogress.html">
+                <label for="reading-progress">Update Progress:</label>
+                <input
+                  type="number"
+                  id="reading-progress"
+                  name="reading-progress"
+                  min="0"
+                  max="100"
+                  value="34"
+                />
+                <button class="btn btn-success" type="submit">Update</button>
+              </form>
             </div>
 
             <div class="column">
+              <div class="book-cover book-cover--pink">
+                <span class="book-label">CURRENTLY READING</span>
                 <h3>The Great Gatsby</h3>
-                <p>F. Scott Fitzgerald</p>
-                <p>Chapter 5 of 9</p>
-                <progress value="56" max="100"></progress>
-                <p>56% complete</p>
-                <form method="get" action="bookprogress.html">
-                    <label for="reading-progress-3">Update Progress:</label>
-                    <input type="number" id="reading-progress-3" name="reading-progress-3" min="0" max="100" value="56">
-                    <button type="submit">Update</button>
-                </form>
+                <p class="book-author">F. Scott Fitzgerald</p>
+              </div>
+
+              <p>Chapter 5 of 9</p>
+              <progress value="56" max="100"></progress>
+              <p>56% complete</p>
+
+              <form method="get" action="bookprogress.html">
+                <label for="reading-progress">Update Progress:</label>
+                <input
+                  type="number"
+                  id="reading-progress"
+                  name="reading-progress"
+                  min="0"
+                  max="100"
+                  value="56"
+                />
+                <button class="btn btn-success" type="submit">Update</button>
+              </form>
             </div>
         </div>
     </main>
