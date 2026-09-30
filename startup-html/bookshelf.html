@@ -67,6 +67,19 @@
                     <div class="shelf-top"></div>
                     <div class="shelf-left"></div>
                     <div class="shelf-right"></div>
+
+                    <div class="shelf-book shelf-book--blue">
+                        East of Eden
+                    </div>
+
+                    <div class="shelf-book shelf-book--pink">
+                        Cinder
+                    </div>
+
+                    <div class="shelf-book shelf-book--green">
+                        The Night Circus
+                    </div>
+
                     <div class="shelf-bottom"></div>
                 </div>
                 <h3>Finished?</h3>
@@ -86,15 +99,6 @@
                     </div>
                     <button class="btn btn-success" type="submit">Submit</button>
                 </form>
-                <section class="currently-reading">
-                    <!-- DATABASE DATA WILL BE LOADED HERE -->
-                    <div class="book">
-                        <h3>East of Eden</h3>
-                        <p>John Steinbeck</p>
-                        <p>Progress: 67%</p>
-                        <progress value="67" max="100"></progress>
-                    </div>
-                </section>
             </div>
 
             <div class="column">
@@ -122,30 +126,32 @@
             </div>
         </div>
 
-        <h3>Search for a book</h3>
-                <p>Enter the title of a book you want to add to your current reads, TBR, or finished books</p>
-                <form method="get" action="bookshelf.html">
+        <div class="column">
+            <h2>Search for a book</h2>
+            <p>Enter the title of a book you want to add to your current reads, TBR, or finished books</p>
+            <form method="get" action="bookshelf.html">
+                <div>
+                <label for="book-title">Book Title:</label>
+                <input type="text" placeholder="Search for a book title..." />
+                </div>
+                <!-- 3rd PARTY API RESULTS WILL APPEAR HERE -->
+                <div class="api-book-result">
+                    <img src="https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1786033865i/9361589.jpg" width="100" alt="Book cover">
                     <div>
-                    <label for="book-title">Book Title:</label>
-                    <input type="text" placeholder="Search for a book title..." />
+                        <h3>The Night Circus</h3>
+                        <p>Erin Morgenstern</p>
+                        <p>Placeholder data from book API</p>
                     </div>
-                    <!-- 3rd PARTY API RESULTS WILL APPEAR HERE -->
-                    <div class="api-book-result">
-                        <img src="https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1786033865i/9361589.jpg" width="100" alt="Book cover">
-                        <div>
-                            <h3>The Night Circus</h3>
-                            <p>Erin Morgenstern</p>
-                            <p>Placeholder data from book API</p>
-                        </div>
-                    </div>
-                    <label for="options">Select a bookshelf:</label>
-                    <select id="options" name="options" placeholder="Select a bookshelf">
-                        <option value="To Be Read">To Read</option>
-                        <option value="Currently Reading">Currently Reading</option>
-                        <option value="Finished">Finished</option>
-                    </select><br>
-                    <button class="btn btn-success" type="submit">Add to Bookshelf</button>
-                </form>
+                </div>
+                <label for="options">Select a bookshelf:</label>
+                <select id="options" name="options" placeholder="Select a bookshelf">
+                    <option value="To Be Read">To Read</option>
+                    <option value="Currently Reading">Currently Reading</option>
+                    <option value="Finished">Finished</option>
+                </select><br>
+                <button class="btn btn-success" type="submit">Add to Bookshelf</button>
+            </form>
+        </div>
     </main>
 
     <footer>
