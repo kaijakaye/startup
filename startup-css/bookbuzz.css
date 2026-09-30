@@ -1,0 +1,131 @@
+progress {
+    background-color: green;
+}
+
+h3 {
+    color: purple;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.column {
+  padding: 1rem;
+  background-color: #fff8ed;
+  border: 2px solid #c49a6c;
+  border-radius: 10px;
+}
+
+/* Overall figure */
+.stick-figure {
+  position: relative;
+  width: 90px;
+  height: 135px;
+  margin: 1rem auto 0;
+}
+
+/* Head */
+.figure-head {
+  position: absolute;
+  top: 0;
+  left: 31px;
+  width: 28px;
+  height: 28px;
+  background-color: #111;
+  border-radius: 50%;
+}
+
+/* Neck */
+.figure-neck {
+  position: absolute;
+  top: 26px;
+  left: 42px;
+  width: 6px;
+  height: 14px;
+  background-color: #111;
+  border-radius: 3px;
+}
+
+/* Shirt / torso */
+.figure-torso {
+  position: absolute;
+  z-index: 2;
+  top: 36px;
+  left: 20px;
+  width: 50px;
+  height: 42px;
+  background: linear-gradient(
+    135deg,
+    var(--shirt-color-one) 0 50%,
+    var(--shirt-color-two) 50% 100%
+  );
+  border: 2px solid #111;
+  border-radius: 50% 50% 10px 10px;
+}
+
+/* Arms */
+.figure-arm {
+  position: absolute;
+  z-index: 1;
+  top: 42px;
+  width: 6px;
+  height: 42px;
+  background-color: #111;
+  border-radius: 5px;
+}
+
+.figure-arm--left {
+  left: 13px;
+  transform: rotate(25deg);
+}
+
+.figure-arm--right {
+  right: 13px;
+  transform: rotate(-25deg);
+}
+
+/* Legs */
+.figure-leg {
+  position: absolute;
+  top: 75px;
+  width: 6px;
+  height: 48px;
+  background-color: #111;
+  border-radius: 5px;
+}
+
+.figure-leg--left {
+  left: 35px;
+  transform: rotate(10deg);
+}
+
+.figure-leg--right {
+  left: 49px;
+  transform: rotate(-10deg);
+}
+
+.stick-figure--green {
+  --shirt-color-one: #4caf50;
+  --shirt-color-two: #a8d96f;
+}
+
+.stick-figure--pink {
+  --shirt-color-one: #e86b9b;
+  --shirt-color-two: #ffc1d6;
+}
+
+.stick-figure--blue {
+  --shirt-color-one: #3f72af;
+  --shirt-color-two: #8ed1fc;
+}
+
+.stick-figure--purple {
+  --shirt-color-one: #805ad5;
+  --shirt-color-two: #d6bcfa;
+}
