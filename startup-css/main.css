@@ -27,6 +27,12 @@ h1 {
   font-style: normal;
 }
 
+h2{
+  font-family: "Carter One", system-ui;
+  font-weight: 400;
+  color: purple;
+}
+
 
 main {
   flex: 1 calc(100vh - 110px);

@@ -1,0 +1,15 @@
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap: 1rem;
+  width: 100%;
+  max-width: 1200px;
+  background-color: hotpink;
+  padding: 10px;
+}
+
+.dashboard-grid section {
+  border: 1px solid black;
+  padding: 10px;
+  text-align: center;
+}
