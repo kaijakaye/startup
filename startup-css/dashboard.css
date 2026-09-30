@@ -1,10 +1,12 @@
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0,1fr));
-  gap: 1rem;
+  gap: 1.25rem;
   width: 100%;
   max-width: 1200px;
-  background-color: hotpink;
+  background-color: #fff8ed;
+  border: 2px solid #c49a6c;
+  border-radius: 10px;
   padding: 10px;
 }
 
