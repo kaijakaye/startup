@@ -17,9 +17,3 @@ th {
   padding-right: 3rem;
   
 }
-
-@media (max-width: 800px) {
-  .columns {
-    grid-template-columns: 1fr;
-  }
-}

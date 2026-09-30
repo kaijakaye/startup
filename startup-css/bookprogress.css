@@ -64,6 +64,14 @@
   font-weight: bold;
 }
 
+#reading-progress {
+  width: 100%;
+  max-width: 150px;
+  padding: 0.5rem;
+  border: 2px solid #39824b;
+  border-radius: 6px;
+}
+
 /* Book colors */
 .book-cover--blue {
   background: linear-gradient(135deg, #3973a8, #83c5e8);
