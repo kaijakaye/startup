@@ -77,13 +77,13 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
-- [ ] **Visually appealing colors and layout. No overflowing elements.** - I did not complete this part of the deliverable.
-- [ ] **Use of a CSS framework** - I did not complete this part of the deliverable.
-- [ ] **All visual elements styled using CSS** - I did not complete this part of the deliverable.
-- [ ] **Responsive to window resizing using flexbox and/or grid display** - I did not complete this part of the deliverable.
-- [ ] **Use of a imported font** - I did not complete this part of the deliverable.
-- [ ] **Use of different types of selectors including element, class, ID, and pseudo selectors** - I did not complete this part of the deliverable.
+- [x] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
+- [x] **Visually appealing colors and layout. No overflowing elements.** - I created a visually appealing color scheme and grid layout.
+- [x] **Use of a CSS framework** - I incorporated the Bootstrap framework.
+- [x] **All visual elements styled using CSS** - I made the elements look nicer via CSS.
+- [x] **Responsive to window resizing using flexbox and/or grid display** - Using grid displays, the elements are now flexible to resizing.
+- [x] **Use of a imported font** - I imported the Carter One font via Google Fonts.
+- [x] **Use of different types of selectors including element, class, ID, and pseudo selectors** - I did complete this part of the deliverable.
 
 ## 🚀 React part 1: Routing deliverable
 
