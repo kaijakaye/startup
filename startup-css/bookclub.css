@@ -1,0 +1,33 @@
+progress {
+    background-color: green;
+}
+
+h3 {
+    color: purple;
+}
+
+tbody {
+  padding: 1rem;
+  background-color: #fff8ed;
+  border: 2px solid #c49a6c;
+  border-radius: 10px;
+  
+}
+
+td {
+  padding-left: 3rem;
+  padding-right: 3rem;
+  
+}
+
+th {
+  padding-left: 3rem;
+  padding-right: 3rem;
+  
+}
+
+@media (max-width: 800px) {
+  .columns {
+    grid-template-columns: 1fr;
+  }
+}
