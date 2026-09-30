@@ -18,6 +18,7 @@ header {
 h1 {
   font-family: "Carter One", system-ui;
   font-weight: 400;
+  color: navy;
 }
 
 .carter-one-regular {
@@ -62,6 +63,8 @@ menu li {
 menu a{
   display: block;
   padding: 0.5rem 0.75rem;
+  text-decoration: solid;
+  color: navy;
 }
 
 
