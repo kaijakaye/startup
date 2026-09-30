@@ -104,6 +104,15 @@ footer a {
   float: none;
 }
 
+progress {
+    background-color: green;
+}
+
+h3 {
+    color: purple;
+}
+
+
 @media (max-height: 600px) {
   header {
     display: none;

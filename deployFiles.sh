@@ -26,4 +26,10 @@ ENDSSH
 
 # Step 2
 printf "\n----> Copy the distribution package to the target.\n"
-scp -r -i "$key" startup-html/* ubuntu@$hostname:services/$service/public
+# HTML files go directly into public so index.html is found
+scp -r -i "$key" startup-html/* \
+  ubuntu@$hostname:services/$service/public/
+
+# CSS files stay in their own folder
+scp -r -i "$key" startup-css/* \
+  ubuntu@$hostname:services/$service/public/startup-css/
