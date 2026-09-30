@@ -1,0 +1,22 @@
+.columns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap: 1rem;
+  width: 100%;
+  max-width: 1200px;
+  background-color: lightgoldenrodyellow;
+  padding: 10px;
+}
+
+.columns column {
+  padding: 10px;
+  text-align: center;
+}
+
+progress {
+    background-color: green;
+}
+
+h3 {
+    color: purple;
+}
