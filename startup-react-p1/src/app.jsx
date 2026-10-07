@@ -12,7 +12,6 @@ import { BookProgress } from './bookprogress/bookprogress';
 export default function App() {
   return (
     <BrowserRouter>
-        <body>
         <header>
         <h1>Shelf Life</h1>
 
@@ -47,7 +46,6 @@ export default function App() {
         <br />
         <a href="https://github.com/kaijakaye/startup">GitHub</a>
         </footer>
-    </body>
   </BrowserRouter>
   )
 }

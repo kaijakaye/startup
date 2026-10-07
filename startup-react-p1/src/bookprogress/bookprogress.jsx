@@ -18,18 +18,16 @@ export function BookProgress() {
               <progress value="67" max="100"></progress>
               <p>67% complete</p>
 
-              <form method="get">
-                <label for="reading-progress">Update Progress:</label>
+                <label htmlFor="reading-progress">Update Progress:</label>
                 <input
                   type="number"
-                  id="reading-progress"
+                  id="reading-progress1"
                   name="reading-progress"
                   min="0"
                   max="100"
                   value="67"
                 />
                 <button className="btn btn-success" type="submit">Update</button>
-              </form>
             </div>
 
             <div className="column">
@@ -43,18 +41,16 @@ export function BookProgress() {
               <progress value="34" max="100"></progress>
               <p>34% complete</p>
 
-              <form method="get" action="bookprogress.html">
-                <label for="reading-progress">Update Progress:</label>
+                <label htmlFor="reading-progress">Update Progress:</label>
                 <input
                   type="number"
-                  id="reading-progress"
+                  id="reading-progress2"
                   name="reading-progress"
                   min="0"
                   max="100"
                   value="34"
                 />
                 <button className="btn btn-success" type="submit">Update</button>
-              </form>
             </div>
 
             <div className="column">
@@ -68,18 +64,16 @@ export function BookProgress() {
               <progress value="56" max="100"></progress>
               <p>56% complete</p>
 
-              <form method="get" action="bookprogress.html">
-                <label for="reading-progress">Update Progress:</label>
+                <label htmlFor="reading-progress">Update Progress:</label>
                 <input
                   type="number"
-                  id="reading-progress"
+                  id="reading-progress3"
                   name="reading-progress"
                   min="0"
                   max="100"
                   value="56"
                 />
                 <button className="btn btn-success" type="submit">Update</button>
-              </form>
             </div>
         </div>
     </main>
