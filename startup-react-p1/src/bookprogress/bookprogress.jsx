@@ -18,7 +18,7 @@ export function BookProgress() {
               <progress value="67" max="100"></progress>
               <p>67% complete</p>
 
-              <form method="get" action="bookprogress.html">
+              <form method="get">
                 <label for="reading-progress">Update Progress:</label>
                 <input
                   type="number"
