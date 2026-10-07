@@ -34,14 +34,14 @@ export function BookClub() {
                     <div>
                     <input type="text" placeholder="Search for a book title..." />
                     </div>
-                    <div class="api-book-result">
+                    <div className="api-book-result">
                     </div>
                     <select id="options-clubs" name="options-clubs" placeholder="Select a book club group to read this with">
                         <option value="Girlfriends">Girlfriends</option>
                         <option value="Family">Family</option>
                         <option value="Work Besties">Work Besties</option>
                     </select><br></br>
-                    <button class="btn btn-success" type="submit">Add to Book Club</button>
+                    <button className="btn btn-success" type="submit">Add to Book Club</button>
                 </form>
     </main>
   );
