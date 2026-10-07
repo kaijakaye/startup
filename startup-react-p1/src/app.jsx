@@ -18,12 +18,12 @@ export default function App() {
 
         <nav className="navbar navbar-expand-lg">
             <menu>
-            <li><a href="index.html">Login</a></li>
-            <li><a href="dashboard.html">Dashboard</a></li>
-            <li><a href="bookshelf.html">Bookshelf</a></li>
-            <li><a href="bookbuzz.html">Book Buzz</a></li>
-            <li><a href="bookclub.html">Book Club</a></li>
-            <li><a href="bookprogress.html">Book Progress</a></li>
+            <li><NavLink className='nav-link' to='login'>Login</NavLink></li>
+            <li><NavLink className='nav-link' to='dashboard'>Dashboard</NavLink></li>
+            <li><NavLink className='nav-link' to='bookshelf'>Bookshelf</NavLink></li>
+            <li><NavLink className='nav-link' to='bookbuzz'>Book Buzz</NavLink></li>
+            <li><NavLink className='nav-link' to='bookclub'>Book Club</NavLink></li>
+            <li><NavLink className='nav-link' to='bookprogress'>Book Progress</NavLink></li>
             </menu>
         </nav>
 
