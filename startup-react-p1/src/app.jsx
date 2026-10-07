@@ -30,7 +30,15 @@ export default function App() {
         <hr />
         </header>
 
-        <main>App components go here</main>
+        <Routes>
+            <Route path='/login' element={<Login />} exact />
+            <Route path='/dashboard' element={<Dashboard />} />
+            <Route path='/bookshelf' element={<Bookshelf />} />
+            <Route path='/bookbuzz' element={<BookBuzz />} />
+            <Route path='/bookclub' element={<BookClub />} />
+            <Route path='/bookprogress' element={<BookProgress />} />
+            <Route path='*' element={<NotFound />} />
+        </Routes>
 
         <footer>
         <hr />
@@ -41,4 +49,8 @@ export default function App() {
     </body>
   </BrowserRouter>
   )
+}
+
+function NotFound() {
+  return <main className="container-fluid bg-secondary text-center">404: Return to sender. Address unknown.</main>;
 }
