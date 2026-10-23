@@ -26,7 +26,7 @@ export function Unauthenticated(props) {
         <>
             <div>
                 <div className='input-group mb-3'>
-                    <span className='input-group-text'>@</span>
+                    <span className='input-group-text'>Username</span>
                     <input className='form-control' type='text' value={userName} onChange={(e) => setUserName(e.target.value)} />
                 </div>
                 <div className='input-group mb-3'>
@@ -36,8 +36,8 @@ export function Unauthenticated(props) {
                 <Button variant='primary' onClick={() => loginUser()}>
                     Login
                 </Button>
-                <Button variant='secondary' onClick={() => createUser()}>
-                    Create User
+                <Button variant='primary' onClick={() => createUser()}>
+                    Register
                 </Button>
             </div>
         </>

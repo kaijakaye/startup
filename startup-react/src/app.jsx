@@ -15,17 +15,31 @@ function App() {
   const currentAuthState = userName ? AuthState.Authenticated : AuthState.Unauthenticated;
   const [authState, setAuthState] = React.useState(currentAuthState);
 
+  function logout() {
+    localStorage.removeItem('userName');
+    props.onLogout();
+  }
+
   return (
     <BrowserRouter>
       <header>
         <h1>Shelf Life</h1>
           <nav className='navbar navbar-expand-lg'>
             <menu>
-              <li className='nav-item'>
-                <NavLink className='nav-link' to='/'>
-                  Login
-                </NavLink>
-              </li>
+              {authState === AuthState.Unauthenticated && (
+                <li className='nav-item'>
+                  <NavLink className='nav-link' to='/'>
+                    Login
+                  </NavLink>
+                </li>
+              )}
+              {authState === AuthState.Authenticated && (
+                <li className='nav-item'>
+                  <NavLink className='nav-link' to='/login' onClick={() => logout()}>
+                    Logout
+                  </NavLink>
+                </li>
+              )}
               {authState === AuthState.Authenticated && (
                 <li className='nav-item'>
                   <NavLink className='nav-link' to='/dashboard'>

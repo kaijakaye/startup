@@ -50,7 +50,6 @@ main {
   justify-content: flex-start;
   gap: 1rem;
   padding-top: 6rem;
-  background-color: pink;
 }
 
 main h1 {
@@ -71,6 +70,7 @@ footer {
   text-align: center;
   padding: 0.5rem 0;
   padding-bottom: 2rem;
+  background-color: lightyellow;
 
 }
 
@@ -90,17 +90,29 @@ menu li {
   flex: 0 0 auto;
 }
 
-menu a nav-link {
+menu .nav-link {
   display: block;
   padding: 0.5rem 0.75rem;
   text-decoration: solid;
   color: navy;
+  border-bottom: 2px solid;
+  border-right: 2px solid;
+  border-left: 2px solid;
+  border-top: 2px solid;
+}
+
+menu .nav-link:hover {
+  background-color: lightyellow;
+  color: purple;
+  border-bottom: 2px solid purple;
+  border-right: 2px solid purple;
+  border-left: 2px solid purple;
+  border-top: 2px solid purple;
 }
 
 
 .navbar-brand {
   padding-left: 0.3em;
-  border-bottom: solid rgb(182, 182, 182) thin;
 }
 
 menu .nav-item {
