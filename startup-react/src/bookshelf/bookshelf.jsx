@@ -1,7 +1,71 @@
 import React from 'react';
 import './bookshelf.css';
+import { useEffect, useState } from 'react';
+import lookupBook from './bookApi';
 
-export function Bookshelf() {
+const shelves = [
+    { id: 'tbr', title: 'To Be Read', description: 'Books you want to read later' },
+    { id: 'reading', title: 'Currently Reading', description: "Books you're reading now" },
+    { id: 'finished', title: 'Finished', description: "Books you've finished" }
+]
+
+const bookColors = ['blue', 'pink', 'green', 'yellow', 'orange', 'purple'];
+
+function storageKey(userName) {
+    return 'shelflife:books:${userName.toLowerCase()}';
+}
+
+function loadBooks(userName) {
+    if (!userName) {
+        return [];
+    }
+
+    try {
+        return JSON.parse(localStorage.getItem(storageKey(userName))) ?? [];
+    } catch {
+        return [];
+    }
+}
+
+function BookCard({ book, index }){
+    const color = bookColors[index % bookColors.length];
+
+    return (
+        <div className={`shelf-book shelf-book--${color}`}>
+            <strong>{book.title}</strong>
+            <br />
+            <span>{book.author}</span>
+            {book.rating != null && <div> Rating: {book.rating}/5</div>}
+        </div>
+    );
+}
+
+function ShelfColumn({ shelf, books }) {
+    const shelfBooks = books.filter((book) => book.shelf === shelf.id);
+    
+    return (
+        <section className="column">
+            <h2>{shelf.title}</h2>
+            <p>{shelf.description}</p>
+
+            <div className="bookshelf">
+                <div className="shelf-top"></div>
+                <div className="shelf-left"></div>
+                <div className="shelf-right"></div>
+                {shelfBooks.map((book, index) => (
+                    <BookCard key={index} book={book} index={index} />
+                ))}
+
+                <div className="shelf-bottom"></div>
+            </div>
+        {shelfBooks.length === 0 && (<p>No books here yet.</p>)}
+        </section>
+
+        
+    );
+}
+
+/*export function Bookshelf() {
   return (
     <main>
         <div className="columns">
@@ -122,4 +186,4 @@ export function Bookshelf() {
         </div>
     </main>
   );
-}
+}*/
