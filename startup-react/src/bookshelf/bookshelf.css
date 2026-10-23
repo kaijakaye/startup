@@ -128,6 +128,25 @@
   overflow-y: hidden;
 }
 
+.book-ratings {
+  margin-top: 1rem;
+  text-align: left;
+}
+
+.book-rating {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid #c49a6c;
+}
+
+.book-rating span:last-child {
+  white-space: nowrap;
+  color: #8b5a2b;
+  font-weight: bold;
+}
+
 @media (max-width: 800px) {
   .columns {
     grid-template-columns: 1fr;

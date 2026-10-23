@@ -35,7 +35,6 @@ function BookCard({ book, index }){
             <strong>{book.title}</strong>
             <br />
             <span>{book.author}</span>
-            {book.rating != null && <div> Rating: {book.rating}/5</div>}
         </div>
     );
 }
@@ -59,6 +58,19 @@ function ShelfColumn({ shelf, books }) {
                 <div className="shelf-right"></div>
                 <div className="shelf-bottom"></div>
             </div>
+            {shelf.id === 'finished' && shelfBooks.some((book) => book.rating != null) && (
+                <div className="book-ratings">
+                    <h3>Your ratings</h3>
+                    {shelfBooks
+                    .filter((book) => book.rating != null)
+                    .map((book) => (
+                        <div className="book-rating" key={book.id}>
+                        <span>{book.title}</span>
+                        <span>★ {book.rating}/5</span>
+                        </div>
+                    ))}
+                </div>
+            )}
         {shelfBooks.length === 0 && (<p>No books here yet.</p>)}
         </section>
 
