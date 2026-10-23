@@ -1,16 +1,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Carter+One&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 
-.body {
+#root {
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  background-color: pink;
   min-width: 375px;
   font-family: "Roboto", sans-serif;
 }
 
 header {
-  min-height: 0 80px;
-  padding-left: 1rem;
-  padding-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 1rem;
   background-color: lightblue;
   border-bottom: 3px solid yellow;
 }
@@ -35,7 +43,7 @@ h2{
 
 
 main {
-  flex: 1 calc(100vh - 110px);
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -56,7 +64,7 @@ main form{
 
 footer {
   border-top: 3px solid yellow;
-  flex: 0 auto;
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -82,7 +90,7 @@ menu li {
   flex: 0 0 auto;
 }
 
-menu a{
+menu a nav-link {
   display: block;
   padding: 0.5rem 0.75rem;
   text-decoration: solid;

@@ -1,7 +1,8 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './app.css';
-import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
+import { AuthState } from './login/authState';
+import { BrowserRouter, NavLink, Navigate, Route, Routes } from 'react-router-dom';
 import { Login } from './login/login';
 import { Dashboard } from './dashboard/dashboard';
 import { Bookshelf } from './bookshelf/bookshelf';
@@ -16,13 +17,12 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className='body bg-dark text-light'>
-        <header className='container-fluid'>
-          <nav className='navbar fixed-top navbar-dark'>
-            <div className='navbar-brand'>Shelf Life</div>
-            <menu className='navbar-nav'>
+      <header>
+        <h1>Shelf Life</h1>
+          <nav className='navbar navbar-expand-lg'>
+            <menu>
               <li className='nav-item'>
-                <NavLink className='nav-link' to='/login'>
+                <NavLink className='nav-link' to='/'>
                   Login
                 </NavLink>
               </li>
@@ -63,9 +63,11 @@ function App() {
               )}
             </menu>
           </nav>
+        <hr />
         </header>
 
         <Routes>
+          <Route path="*" element={<Navigate to="/login" replace />} />
           <Route
             path='/login'
             element={
@@ -88,7 +90,7 @@ function App() {
           <Route path='*' element={<NotFound />} />
         </Routes>
 
-        <footer className='bg-dark text-dark text-muted'>
+        <footer>
           <hr />
           <span className='text-reset'>Author Name: Kaija Sorensen</span>
           <br />
@@ -96,13 +98,12 @@ function App() {
             GitHub
           </a>
         </footer>
-      </div>
     </BrowserRouter>
   );
 }
 
 function NotFound() {
-  return <main className='container-fluid bg-secondary text-center'>404: Return to sender. Address unknown.</main>;
+  return <main className='container-fluid text-center'>404: Return to sender. Address unknown.</main>;
 }
 
 export default App;
