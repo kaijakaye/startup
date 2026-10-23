@@ -9,7 +9,105 @@ import { BookBuzz } from './bookbuzz/bookbuzz';
 import { BookClub } from './bookclub/bookclub';
 import { BookProgress } from './bookprogress/bookprogress';
 
-export default function App() {
+function App() {
+  const [userName, setUserName] = React.useState(localStorage.getItem('userName') || '');
+  const currentAuthState = userName ? AuthState.Authenticated : AuthState.Unauthenticated;
+  const [authState, setAuthState] = React.useState(currentAuthState);
+
+  return (
+    <BrowserRouter>
+      <div className='body bg-dark text-light'>
+        <header className='container-fluid'>
+          <nav className='navbar fixed-top navbar-dark'>
+            <div className='navbar-brand'>Shelf Life</div>
+            <menu className='navbar-nav'>
+              <li className='nav-item'>
+                <NavLink className='nav-link' to='/login'>
+                  Login
+                </NavLink>
+              </li>
+              {authState === AuthState.Authenticated && (
+                <li className='nav-item'>
+                  <NavLink className='nav-link' to='/dashboard'>
+                    Dashboard
+                  </NavLink>
+                </li>
+              )}
+              {authState === AuthState.Authenticated && (
+                <li className='nav-item'>
+                  <NavLink className='nav-link' to='/bookshelf'>
+                    Bookshelf
+                  </NavLink>
+                </li>
+              )}
+              {authState === AuthState.Authenticated && (
+                <li className='nav-item'>
+                  <NavLink className='nav-link' to='/bookbuzz'>
+                    Book Buzz
+                  </NavLink>
+                </li>
+              )}
+              {authState === AuthState.Authenticated && (
+                <li className='nav-item'>
+                  <NavLink className='nav-link' to='/bookclub'>
+                    Book Club
+                  </NavLink>
+                </li>
+              )}
+              {authState === AuthState.Authenticated && (
+                <li className='nav-item'>
+                  <NavLink className='nav-link' to='/bookprogress'>
+                    Book Progress
+                  </NavLink>
+                </li>
+              )}
+            </menu>
+          </nav>
+        </header>
+
+        <Routes>
+          <Route
+            path='/login'
+            element={
+              <Login
+                userName={userName}
+                authState={authState}
+                onAuthChange={(userName, authState) => {
+                  setUserName(userName);
+                  setAuthState(authState);
+                }}
+              />
+            }
+            exact
+          />
+          <Route path='/dashboard' element={<Dashboard />} />
+          <Route path='/bookshelf' element={<Bookshelf />} />
+          <Route path='/bookbuzz' element={<BookBuzz />} />
+          <Route path='/bookclub' element={<BookClub />} />
+          <Route path='/bookprogress' element={<BookProgress />} />
+          <Route path='*' element={<NotFound />} />
+        </Routes>
+
+        <footer className='bg-dark text-dark text-muted'>
+          <hr />
+          <span className='text-reset'>Author Name: Kaija Sorensen</span>
+          <br />
+          <a href='https://github.com/kaijakaye/startup' target='_blank' rel='noopener noreferrer'>
+            GitHub
+          </a>
+        </footer>
+      </div>
+    </BrowserRouter>
+  );
+}
+
+function NotFound() {
+  return <main className='container-fluid bg-secondary text-center'>404: Return to sender. Address unknown.</main>;
+}
+
+export default App;
+
+/*export default function App() {
   return (
     <BrowserRouter>
         <header>
@@ -52,4 +150,4 @@ export default function App() {
 
 function NotFound() {
   return <main className="container-fluid bg-secondary text-center">404: Return to sender. Address unknown.</main>;
-}
+}*/
