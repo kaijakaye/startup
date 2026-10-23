@@ -1,7 +1,7 @@
 import React from 'react';
 import './bookshelf.css';
 import { useEffect, useState } from 'react';
-import lookupBook from './bookApi';
+import { lookupBook } from './bookAPI';
 
 const shelves = [
     { id: 'tbr', title: 'To Be Read', description: 'Books you want to read later' },
@@ -9,7 +9,7 @@ const shelves = [
     { id: 'finished', title: 'Finished', description: "Books you've finished" }
 ]
 
-const bookColors = ['blue', 'pink', 'green', 'yellow', 'orange', 'purple'];
+const bookColors = ['blue', 'pink', 'green', 'yellow', 'lightgreen', 'purple'];
 
 function storageKey(userName) {
     return 'shelflife:books:${userName.toLowerCase()}';
@@ -51,17 +51,168 @@ function ShelfColumn({ shelf, books }) {
             <div className="bookshelf">
                 <div className="shelf-top"></div>
                 <div className="shelf-left"></div>
+                <div className="bookshelf-books">
+                    {shelfBooks.map((book, index) => (
+                        <BookCard key={index} book={book} index={index} />
+                    ))}
+                </div>
                 <div className="shelf-right"></div>
-                {shelfBooks.map((book, index) => (
-                    <BookCard key={index} book={book} index={index} />
-                ))}
-
                 <div className="shelf-bottom"></div>
             </div>
         {shelfBooks.length === 0 && (<p>No books here yet.</p>)}
         </section>
 
         
+    );
+}
+
+export function Bookshelf({ userName }) {
+    const [books, setBooks] = useState(loadBooks(userName));
+    const [title, setTitle] = useState('');
+    const [author, setAuthor] = useState('');
+    const [shelf, setShelf] = useState('tbr');
+    const [rating, setRating] = useState('');
+
+    useEffect(() => {
+        if (userName) {
+            localStorage.setItem(storageKey(userName), JSON.stringify(books));
+        }
+    }, [books, userName]);
+
+    async function handleSubmit(event) {
+        event.preventDefault();
+
+        const bookDetails = await lookupBook(title, author);
+        const newBook = {
+            ...bookDetails,
+            id: window.crypto.randomUUID?.() ?? '${Date.now()}-${Math.random()}',
+            shelf,
+            rating: shelf==='finished' && rating !== '' ? Number(rating) : null,
+        };
+
+        function normalizeTitle(title) {
+            return title.toLowerCase().replace(/[^a-z0-9]/g, '');
+        }
+
+        // After `bookDetails` is returned:
+        const incomingBook = {
+            ...bookDetails,
+            shelf,
+            rating: shelf === 'finished' && rating !== '' ? Number(rating) : null,
+        };
+
+        setBooks((currentBooks) => {
+        const existing = currentBooks.find(
+            (book) => normalizeTitle(book.title) === normalizeTitle(incomingBook.title)
+        );
+
+        if (existing) {
+            // Keep the existing ID so React treats it as the same book.
+            return currentBooks.map((book) =>
+            book.id === existing.id
+                ? {
+                    ...book,
+                    ...incomingBook,
+                    author:
+                    incomingBook.author === 'Unknown author'
+                        ? book.author
+                        : incomingBook.author,
+                }
+                : book
+            );
+        }
+
+        return [
+            ...currentBooks,
+            {
+            ...incomingBook,
+            id: window.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`,
+            },
+        ];
+        });
+        setTitle('');
+        setAuthor('');
+        setRating('');
+    }
+
+    if(!userName) {
+        return (
+            <main>
+                <p>Please log in to view your bookshelf.</p>
+            </main>
+        );
+    }
+
+    return (
+        <main>
+            <div className="columns">
+                {shelves.map((item) => (
+                    <ShelfColumn key={item.id} shelf={item} books={books} />
+                ))}
+            </div>
+
+            <section className="column">
+                <h2>Add a book</h2>
+                <p>Enter the title and choose which shelf it belongs on.</p>
+
+                <form onSubmit={handleSubmit}>
+                    <div>
+                        <label htmlFor="book-title">Book Title:</label>
+                        <input
+                            type="text"
+                            id="book-title"
+                            value={title}
+                            onChange={(event) => setTitle(event.target.value)}
+                            placeholder="Book Title"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="author-name">Author Name:</label>
+                        <input
+                            type="text"
+                            id="author-name"
+                            value={author}
+                            onChange={(event) => setAuthor(event.target.value)}
+                            placeholder="Author Name"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="book-shelf">Shelf:</label>
+                        <select
+                            id="book-shelf"
+                            value={shelf}
+                            onChange={(event) => setShelf(event.target.value)}
+                        >
+                            {shelves.map((item) => (
+                                <option key={item.id} value={item.id}>{item.title}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {shelf === 'finished' && (
+                        <div>
+                            <label htmlFor="rating">Rating:</label>
+                            <input
+                                type="number"
+                                id="rating"
+                                min="0"
+                                max="5"
+                                step="0.5"
+                                value={rating}
+                                onChange={(event) => setRating(event.target.value)}
+                                placeholder="Rating (0-5)"
+                            />
+                        </div>
+                    )}
+                    <button className="btn btn-success" type="submit">
+                        Add to bookshelf
+                    </button>
+                </form>
+            </section>
+
+        </main>
     );
 }
 

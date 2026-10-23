@@ -17,7 +17,8 @@ function App() {
 
   function logout() {
     localStorage.removeItem('userName');
-    props.onLogout();
+    setUserName('');
+    setAuthState(AuthState.Unauthenticated);
   }
 
   return (
@@ -97,7 +98,7 @@ function App() {
             exact
           />
           <Route path='/dashboard' element={<Dashboard />} />
-          <Route path='/bookshelf' element={<Bookshelf />} />
+          <Route path='/bookshelf' element={<Bookshelf key={userName} userName={userName} />}/>
           <Route path='/bookbuzz' element={<BookBuzz />} />
           <Route path='/bookclub' element={<BookClub />} />
           <Route path='/bookprogress' element={<BookProgress />} />

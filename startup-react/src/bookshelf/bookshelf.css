@@ -85,6 +85,49 @@
   background-color: #754668;
 }
 
+.shelf-book--yellow {
+  background-color: #f2c94c;
+  color: #34240e;
+}
+
+.shelf-book--lightgreen {
+  background-color: lightgreen;
+}
+
+
+.bookshelf-scroll {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.bookshelf {
+  position: relative;
+  width: 100%;
+  height: 260px;
+  box-sizing: border-box;
+  background-color: #d8b07a;
+  border: 8px solid #8b5a2b;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.bookshelf-books {
+  position: absolute;
+  z-index: 1;
+  top: 22px;
+  right: 22px;
+  bottom: 22px;
+  left: 22px;
+
+  display: flex;
+  align-items: flex-end;
+  gap: 0.35rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
 @media (max-width: 800px) {
   .columns {
     grid-template-columns: 1fr;
