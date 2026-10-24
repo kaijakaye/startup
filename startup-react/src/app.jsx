@@ -9,6 +9,7 @@ import { Bookshelf } from './bookshelf/bookshelf';
 import { BookBuzz } from './bookbuzz/bookbuzz';
 import { BookClub } from './bookclub/bookclub';
 import { BookProgress } from './bookprogress/bookprogress';
+import { ensureLocalUser } from './socialData';
 
 function App() {
   const [userName, setUserName] = React.useState(localStorage.getItem('userName') || '');
@@ -20,6 +21,10 @@ function App() {
     setUserName('');
     setAuthState(AuthState.Unauthenticated);
   }
+
+  React.useEffect(() => {
+    if (userName) void ensureLocalUser(userName);
+  }, [userName]);
 
   return (
     <BrowserRouter>
@@ -99,8 +104,8 @@ function App() {
           />
           <Route path='/dashboard' element={<Dashboard key={userName} userName={userName} />} />
           <Route path='/bookshelf' element={<Bookshelf key={userName} userName={userName} />}/>
-          <Route path='/bookbuzz' element={<BookBuzz />} />
-          <Route path='/bookclub' element={<BookClub />} />
+          <Route path='/bookbuzz' element={<BookBuzz key={userName} userName={userName} />} />
+          <Route path='/bookclub' element={<BookClub key={userName} userName={userName} />} />
           <Route path='/bookprogress' element={<BookProgress key={userName} userName={userName} />} />
           <Route path='*' element={<NotFound />} />
         </Routes>
