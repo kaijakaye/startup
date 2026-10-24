@@ -12,7 +12,7 @@ const shelves = [
 const bookColors = ['blue', 'pink', 'green', 'yellow', 'lightgreen', 'purple'];
 
 function storageKey(userName) {
-    return 'shelflife:books:${userName.toLowerCase()}';
+    return `shelflife:books:${userName.toLowerCase()}`;
 }
 
 function loadBooks(userName) {

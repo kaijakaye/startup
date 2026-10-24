@@ -22,22 +22,27 @@ export function saveBooks(userName, books) {
 }
 
 export function useBookshelf(userName) {
-    const [books, setBooks] = useState(() => readBooks(userName));
+  const [books, setBooks] = useState(() => readBooks(userName));
 
-    useEffect(() => {
-        const refresh = () => setBooks(readBooks(userName));
+  useEffect(() => {
+    const refresh = () => setBooks(readBooks(userName));
 
-        refresh();
-        window.addEventListener('shelflife:books-changed', refresh);
-        window.addEventListener('storage', refresh);
+    refresh();
+    window.addEventListener('shelflife:books-changed', refresh);
+    window.addEventListener('storage', refresh);
 
-        return () => {
-            window.removeEventListener('shelflife:books-changed', refresh);
-            window.removeEventListener('storage', refresh);
-        };
-    }, [userName]);
+    return () => {
+      window.removeEventListener('shelflife:books-changed', refresh);
+      window.removeEventListener('storage', refresh);
+    };
+  }, [userName]);
 
-    return [books, updateBooks];
+  function updateBooks(nextBooks) {
+    setBooks(nextBooks);
+    saveBooks(userName, nextBooks);
+  }
+
+  return [books, updateBooks];
 }
 
 export function progressPercent(book) {
@@ -51,12 +56,12 @@ export function progressPercent(book) {
 
 }
 
-export function shelfType(shelf = ''){
-    const value = shelf.toLowerCase().replaceAll('-', ' ').replaceAll('_', ' ');
+export function shelfType(shelf = '') {
+    const value = shelf.toLowerCase().trim().replace(/[-_]/g, ' ');
 
-    if(value.includes('currently reading')) { return 'reading'; }
-    if(value.includes('to be read') || value.includes('tbr')) { return 'tbr'; }
-    if(value.includes('finished') || value.includes('read')) { return 'finished'; }
+    if (value === 'reading' || value === 'currently reading') return 'reading';
+    if (value === 'tbr' || value === 'to be read' || value === 'to read') return 'tbr';
+    if (value === 'finished' || value === 'read' || value === 'completed') return 'finished';
 
     return value;
 }

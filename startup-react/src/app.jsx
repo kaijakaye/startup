@@ -97,11 +97,11 @@ function App() {
             }
             exact
           />
-          <Route path='/dashboard' element={<Dashboard />} />
+          <Route path='/dashboard' element={<Dashboard key={userName} userName={userName} />} />
           <Route path='/bookshelf' element={<Bookshelf key={userName} userName={userName} />}/>
           <Route path='/bookbuzz' element={<BookBuzz />} />
           <Route path='/bookclub' element={<BookClub />} />
-          <Route path='/bookprogress' element={<BookProgress />} />
+          <Route path='/bookprogress' element={<BookProgress key={userName} userName={userName} />} />
           <Route path='*' element={<NotFound />} />
         </Routes>
 
