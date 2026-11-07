@@ -4,6 +4,7 @@ import Button from 'react-bootstrap/Button';
 
 export function Unauthenticated({ userName, onLogin }) {
   const [email, setEmail] = React.useState(userName ?? '');
+  const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [displayError, setDisplayError] = React.useState('');
   const [busy, setBusy] = React.useState(false);
@@ -13,10 +14,26 @@ export function Unauthenticated({ userName, onLogin }) {
     setDisplayError('');
 
     const normalizedEmail = email.trim().toLowerCase();
+    const normalizedUsername = username.trim().toLowerCase();
+    const isRegistering = path === '/api/auth/create';
 
     if (!normalizedEmail || !password) {
       setDisplayError('Enter your email and password.');
       return;
+    }
+
+    if (isRegistering && !normalizedUsername) {
+      setDisplayError('Enter a username for friend requests.');
+      return;
+    }
+
+    const body = {
+      email: normalizedEmail,
+      password,
+    };
+
+    if (isRegistering) {
+      body.username = normalizedUsername;
     }
 
     setBusy(true);
@@ -26,10 +43,7 @@ export function Unauthenticated({ userName, onLogin }) {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: normalizedEmail,
-          password,
-        }),
+        body: JSON.stringify(body),
       });
 
       const result = await response.json().catch(() => ({}));
@@ -38,10 +52,11 @@ export function Unauthenticated({ userName, onLogin }) {
         throw new Error(result.msg || `Request failed: ${response.status}`);
       }
 
-      // This is just the displayed account name. The backend auth token
-      // stays in its HttpOnly cookie.
-      localStorage.setItem('userName', result.email);
-      onLogin(result.email);
+      const displayName = result.username || result.email || normalizedEmail;
+
+      // The auth token stays in the backend's HttpOnly cookie.
+      localStorage.setItem('userName', displayName);
+      onLogin(displayName);
       navigate('/dashboard');
     } catch (err) {
       setDisplayError(err.message || 'Could not authenticate.');
@@ -64,6 +79,17 @@ export function Unauthenticated({ userName, onLogin }) {
       </div>
 
       <div className="input-group mb-3">
+        <span className="input-group-text">Username</span>
+        <input
+          className="form-control"
+          type="text"
+          value={username}
+          onChange={(event) => setUsername(event.target.value)}
+          placeholder="Used for friend requests; required to register"
+        />
+      </div>
+
+      <div className="input-group mb-3">
         <span className="input-group-text">Password</span>
         <input
           className="form-control"
@@ -81,6 +107,7 @@ export function Unauthenticated({ userName, onLogin }) {
       )}
 
       <Button
+        type="button"
         variant="primary"
         disabled={busy}
         onClick={() => authenticate('/api/auth/login')}
@@ -89,6 +116,7 @@ export function Unauthenticated({ userName, onLogin }) {
       </Button>
 
       <Button
+        type="button"
         className="ms-2"
         variant="secondary"
         disabled={busy}

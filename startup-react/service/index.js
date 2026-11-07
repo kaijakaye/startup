@@ -29,27 +29,37 @@ app.use(`/api`, apiRouter);
 
 // CreateAuth a new user
 apiRouter.post('/auth/create', async (req, res) => {
-  if (await findUser('email', req.body.email)) {
-    res.status(409).send({ msg: 'Existing user' });
-  } else {
-    const user = await createUser(req.body.email, req.body.password);
+  const email = String(req.body.email ?? '').trim().toLowerCase();
+  const username = String(req.body.username ?? '').trim().toLowerCase();
+  const password = req.body.password;
 
-    setAuthCookie(res, user.token);
-    res.send({ email: user.email });
+  if (!email || !username || !password) {
+    return res.status(400).send({ msg: 'Email, username, and password are required' });
   }
+
+  if (
+    await findUser('email', email) ||
+    await findUser('username', username)
+  ) {
+    return res.status(409).send({ msg: 'Email or username already exists' });
+  }
+
+  const user = await createUser(email, username, password);
+  setAuthCookie(res, user.token);
+  res.send({ email: user.email, username: user.username });
 });
 
 // GetAuth login an existing user
 apiRouter.post('/auth/login', async (req, res) => {
-  const user = await findUser('email', req.body.email);
-  if (user) {
-    if (await bcrypt.compare(req.body.password, user.password)) {
-      user.token = uuid.v4();
-      setAuthCookie(res, user.token);
-      res.send({ email: user.email });
-      return;
-    }
+  const email = String(req.body.email ?? '').trim().toLowerCase();
+  const user = await findUser('email', email);
+
+  if (user && await bcrypt.compare(req.body.password, user.password)) {
+    user.token = uuid.v4();
+    setAuthCookie(res, user.token);
+    return res.send({ email: user.email, username: user.username });
   }
+
   res.status(401).send({ msg: 'Unauthorized' });
 });
 
@@ -152,6 +162,124 @@ apiRouter.delete('/books/:id', verifyAuth, (req, res) => {
   res.status(204).end();
 });
 
+apiRouter.post('/friends/requests', verifyAuth, async (req, res) => {
+  const username = String(req.body.username ?? '').trim().toLowerCase();
+
+  if (!username) {
+    return res.status(400).send({ msg: 'Username is required' });
+  }
+
+  const recipient = await findUser('username', username);
+
+  if (!recipient) {
+    return res.status(404).send({ msg: 'User not found' });
+  }
+
+  if (recipient.id === req.user.id) {
+    return res.status(400).send({ msg: 'You cannot friend yourself' });
+  }
+
+  const samePair = (request) =>
+    (request.requesterId === req.user.id && request.recipientId === recipient.id) ||
+    (request.requesterId === recipient.id && request.recipientId === req.user.id);
+
+  const existing = friendRequests.find(
+    (request) =>
+      samePair(request) &&
+      ['pending', 'accepted'].includes(request.status)
+  );
+
+  if (existing) {
+    return res.status(409).send({ msg: 'A request or friendship already exists' });
+  }
+
+  const request = {
+    id: uuid.v4(),
+    requesterId: req.user.id,
+    recipientId: recipient.id,
+    status: 'pending',
+    createdAt: new Date().toISOString(),
+  };
+
+  friendRequests.push(request);
+  res.status(201).send({ id: request.id, status: request.status });
+});
+
+apiRouter.get('/friends/requests', verifyAuth, (req, res) => {
+  const pending = friendRequests
+    .filter(
+      (request) =>
+        request.status === 'pending' &&
+        (request.requesterId === req.user.id ||
+          request.recipientId === req.user.id)
+    )
+    .map((request) => {
+      const incoming = request.recipientId === req.user.id;
+      const otherUserId = incoming
+        ? request.requesterId
+        : request.recipientId;
+      const otherUser = users.find((user) => user.id === otherUserId);
+
+      return {
+        id: request.id,
+        direction: incoming ? 'incoming' : 'outgoing',
+        username: otherUser?.username,
+        createdAt: request.createdAt,
+      };
+    });
+
+  res.send(pending);
+});
+
+apiRouter.patch('/friends/requests/:id', verifyAuth, (req, res) => {
+  const request = friendRequests.find(
+    (item) => item.id === req.params.id
+  );
+
+  if (!request) {
+    return res.status(404).send({ msg: 'Request not found' });
+  }
+
+  if (request.recipientId !== req.user.id) {
+    return res.status(403).send({ msg: 'Only the recipient can respond' });
+  }
+
+  if (request.status !== 'pending') {
+    return res.status(409).send({ msg: 'Request is no longer pending' });
+  }
+
+  const { action } = req.body;
+
+  if (!['accept', 'decline'].includes(action)) {
+    return res.status(400).send({ msg: 'Action must be accept or decline' });
+  }
+
+  request.status = action === 'accept' ? 'accepted' : 'declined';
+  res.send({ id: request.id, status: request.status });
+});
+
+apiRouter.get('/friends', verifyAuth, (req, res) => {
+  const friends = friendRequests
+    .filter(
+      (request) =>
+        request.status === 'accepted' &&
+        (request.requesterId === req.user.id ||
+          request.recipientId === req.user.id)
+    )
+    .map((request) => {
+      const friendId =
+        request.requesterId === req.user.id
+          ? request.recipientId
+          : request.requesterId;
+
+      const friend = users.find((user) => user.id === friendId);
+      return friend && { id: friend.id, username: friend.username };
+    })
+    .filter(Boolean);
+
+  res.send(friends);
+});
+
 // Default error handler
 app.use(function (err, req, res, next) {
   res.status(500).send({ type: err.name, message: err.message });
@@ -162,17 +290,18 @@ app.use((_req, res) => {
   res.sendFile('index.html', { root: 'public' });
 });
 
-async function createUser(email, password) {
+async function createUser(email, username, password) {
   const passwordHash = await bcrypt.hash(password, 10);
 
   const user = {
     id: uuid.v4(),
-    email: email,
+    email,
+    username,
     password: passwordHash,
     token: uuid.v4(),
   };
-  users.push(user);
 
+  users.push(user);
   return user;
 }
 
