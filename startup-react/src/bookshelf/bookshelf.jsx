@@ -115,23 +115,11 @@ export function Bookshelf({ userName }) {
 
     async function handleSubmit(event) {
         event.preventDefault();
+        setError('');
 
-        const newBook = {
-            ...bookDetails,
-            id: window.crypto.randomUUID?.() ?? '${Date.now()}-${Math.random()}',
-            shelf,
-            rating: shelf==='finished' && rating !== '' ? Number(rating) : null,
-        };
+        try {
+            const bookDetails = await lookupBook(title, author);
 
-        // After `bookDetails` is returned:
-        const incomingBook = {
-            ...bookDetails,
-            shelf,
-            rating: shelf === 'finished' && rating !== '' ? Number(rating) : null,
-        };
-
-        try{
-        const bookDetails = await lookupBook(title, author);
             const existing = books.find(
             (book) => normalizeTitle(book.title) === normalizeTitle(bookDetails.title)
             );
@@ -142,11 +130,14 @@ export function Bookshelf({ userName }) {
             };
 
             if (existing) {
+            // Move/update the existing book instead of adding a duplicate.
             const savedBook = await updateBook(existing.id, changes);
             const updatedBook = fromApiBook(savedBook);
 
             setBooks((current) =>
-                current.map((book) => book.id === updatedBook.id ? updatedBook : book)
+                current.map((book) =>
+                book.id === updatedBook.id ? updatedBook : book
+                )
             );
             } else {
             const savedBook = await createBook({
@@ -157,13 +148,13 @@ export function Bookshelf({ userName }) {
 
             setBooks((current) => [...current, fromApiBook(savedBook)]);
             }
+
+            setTitle('');
+            setAuthor('');
+            setRating('');
         } catch (err) {
             setError(err.message || 'Could not save the book. Please try again.');
         }
-
-        setTitle('');
-        setAuthor('');
-        setRating('');
     }
 
     if(!userName) {
