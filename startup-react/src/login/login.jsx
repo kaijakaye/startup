@@ -1,46 +1,51 @@
 import React from 'react';
-
 import { Unauthenticated } from './unauthenticated';
 import { Authenticated } from './authenticated';
 import { AuthState } from './authState';
 
 export function Login({ userName, authState, onAuthChange }) {
+  const [logoutError, setLogoutError] = React.useState('');
+
+  async function logout() {
+    setLogoutError('');
+
+    try {
+      const response = await fetch('/api/auth/logout', {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error(`Logout failed: ${response.status}`);
+      }
+
+      localStorage.removeItem('userName');
+      onAuthChange(userName, AuthState.Unauthenticated);
+    } catch (err) {
+      setLogoutError(err.message || 'Could not log out.');
+    }
+  }
+
   return (
-    <main className='container-fluid text-center'>
-      <div>
-        {authState !== AuthState.Unknown && <h1>Welcome to Shelf Life</h1>}
-        {authState === AuthState.Authenticated && (
-          <Authenticated userName={userName} onLogout={() => onAuthChange(userName, AuthState.Unauthenticated)} />
-        )}
-        {authState === AuthState.Unauthenticated && (
-          <Unauthenticated
-            userName={userName}
-            onLogin={(loginUserName) => {
-              onAuthChange(loginUserName, AuthState.Authenticated);
-            }}
-          />
-        )}
-      </div>
+    <main className="container-fluid text-center">
+      {authState !== AuthState.Unknown && <h1>Welcome to Shelf Life</h1>}
+
+      {logoutError && (
+        <p className="alert alert-danger" role="alert">
+          {logoutError}
+        </p>
+      )}
+
+      {authState === AuthState.Authenticated && (
+        <Authenticated userName={userName} onLogout={logout} />
+      )}
+
+      {authState === AuthState.Unauthenticated && (
+        <Unauthenticated
+          userName={userName}
+          onLogin={(email) => onAuthChange(email, AuthState.Authenticated)}
+        />
+      )}
     </main>
   );
 }
-
-/*export function Login() {
-  return (
-    <main>
-      <h1>Welcome to Shelf Life</h1>
-      <form method="get" action="bookshelf.html">
-        <div>
-          <span>@</span>
-          <input type="email" placeholder="your@email.com" />
-        </div>
-        <div>
-          <span>🔒</span>
-          <input type="password" placeholder="password" />
-        </div>
-        <button className="btn btn-success" type="submit">Login</button>
-        <button className="btn btn-success" type="submit">Create</button>
-      </form>
-    </main>
-  );
-}*/

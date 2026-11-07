@@ -1,27 +1,37 @@
-export async function lookupBook(title, typedAuthor = '') {
+export async function searchBooks(title, author = '') {
   const search = [
     `intitle:${title.trim()}`,
-    typedAuthor.trim() && `inauthor:${typedAuthor.trim()}`,
+    author.trim() && `inauthor:${author.trim()}`,
   ]
     .filter(Boolean)
     .join(' ');
 
-  const params = new URLSearchParams({ q: search, maxResults: '1' });
+  const params = new URLSearchParams({
+    q: search,
+    maxResults: '10',
+    printType: 'books',
+  });
+
+  const apiKey = import.meta.env.VITE_GOOGLE_BOOKS_API_KEY;
+  if (!apiKey) {
+    throw new Error('Google Books API key is missing from .env.local');
+  }
+  params.set('key', apiKey);
+
   const response = await fetch(
     `https://www.googleapis.com/books/v1/volumes?${params}`
   );
+  const data = await response.json().catch(() => ({}));
 
-  if (!response.ok) throw new Error('Book search failed');
+  if (!response.ok) {
+    throw new Error(data.error?.message || `Google Books returned ${response.status}`);
+  }
 
-  const data = await response.json();
-  const volume = data.items?.[0];
-  const info = volume?.volumeInfo;
-
-  return {
-    googleBooksId: volume?.id ?? null,
-    title: info?.title ?? title.trim(),
-    author: typedAuthor.trim() || info?.authors?.join(', ') || 'Unknown author',
-    coverUrl: info?.imageLinks?.thumbnail?.replace(/^http:/, 'https:') ?? '',
-    totalPages: info?.pageCount ?? null,
-  };
+  return (data.items ?? []).map(({ id, volumeInfo = {} }) => ({
+    googleBooksId: id,
+    title: volumeInfo.title ?? 'Untitled',
+    author: volumeInfo.authors?.join(', ') ?? 'Unknown author',
+    coverUrl: volumeInfo.imageLinks?.thumbnail?.replace(/^http:/, 'https:') ?? '',
+    totalPages: volumeInfo.pageCount ?? null,
+  }));
 }
