@@ -2,6 +2,7 @@ import React from 'react';
 import './bookshelf.css';
 import { useEffect, useState } from 'react';
 import { lookupBook } from './bookAPI';
+import { getBooks, createBook, updateBook } from './bookshelfAPI';
 
 const shelves = [
     { id: 'tbr', title: 'To Be Read', description: 'Books you want to read later' },
@@ -11,21 +12,26 @@ const shelves = [
 
 const bookColors = ['blue', 'pink', 'green', 'yellow', 'lightgreen', 'purple'];
 
-function storageKey(userName) {
-    return `shelflife:books:${userName.toLowerCase()}`;
+const toApiShelf = {
+  tbr: 'to-read',
+  reading: 'reading',
+  finished: 'read',
+};
+
+const toUiShelf = {
+  'to-read': 'tbr',
+  reading: 'reading',
+  read: 'finished',
+};
+
+function fromApiBook(book) {
+  return { ...book, shelf: toUiShelf[book.shelf] ?? book.shelf };
 }
 
-function loadBooks(userName) {
-    if (!userName) {
-        return [];
-    }
-
-    try {
-        return JSON.parse(localStorage.getItem(storageKey(userName))) ?? [];
-    } catch {
-        return [];
-    }
+function normalizeTitle(title) {
+  return title.toLowerCase().replace(/[^a-z0-9]/g, '');
 }
+
 
 function BookCard({ book, index }){
     const color = bookColors[index % bookColors.length];
@@ -79,32 +85,43 @@ function ShelfColumn({ shelf, books }) {
 }
 
 export function Bookshelf({ userName }) {
-    const [books, setBooks] = useState(loadBooks(userName));
+    const [books, setBooks] = useState([]);
+    const [error, setError] = useState('');
     const [title, setTitle] = useState('');
     const [author, setAuthor] = useState('');
     const [shelf, setShelf] = useState('tbr');
     const [rating, setRating] = useState('');
 
     useEffect(() => {
-        if (userName) {
-            localStorage.setItem(storageKey(userName), JSON.stringify(books));
+        if (!userName) {
+            setBooks([]);
+            return;
         }
-    }, [books, userName]);
+
+        let cancelled = false;
+
+        getBooks()
+            .then((savedBooks) => {
+            if (!cancelled) setBooks(savedBooks.map(fromApiBook));
+            })
+            .catch((err) => {
+            if (!cancelled) setError(err.message || 'Could not load your books.');
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [userName]);
 
     async function handleSubmit(event) {
         event.preventDefault();
 
-        const bookDetails = await lookupBook(title, author);
         const newBook = {
             ...bookDetails,
             id: window.crypto.randomUUID?.() ?? '${Date.now()}-${Math.random()}',
             shelf,
             rating: shelf==='finished' && rating !== '' ? Number(rating) : null,
         };
-
-        function normalizeTitle(title) {
-            return title.toLowerCase().replace(/[^a-z0-9]/g, '');
-        }
 
         // After `bookDetails` is returned:
         const incomingBook = {
@@ -113,35 +130,37 @@ export function Bookshelf({ userName }) {
             rating: shelf === 'finished' && rating !== '' ? Number(rating) : null,
         };
 
-        setBooks((currentBooks) => {
-        const existing = currentBooks.find(
-            (book) => normalizeTitle(book.title) === normalizeTitle(incomingBook.title)
-        );
-
-        if (existing) {
-            // Keep the existing ID so React treats it as the same book.
-            return currentBooks.map((book) =>
-            book.id === existing.id
-                ? {
-                    ...book,
-                    ...incomingBook,
-                    author:
-                    incomingBook.author === 'Unknown author'
-                        ? book.author
-                        : incomingBook.author,
-                }
-                : book
+        try{
+        const bookDetails = await lookupBook(title, author);
+            const existing = books.find(
+            (book) => normalizeTitle(book.title) === normalizeTitle(bookDetails.title)
             );
+
+            const changes = {
+            shelf: toApiShelf[shelf],
+            rating: shelf === 'finished' && rating !== '' ? Number(rating) : null,
+            };
+
+            if (existing) {
+            const savedBook = await updateBook(existing.id, changes);
+            const updatedBook = fromApiBook(savedBook);
+
+            setBooks((current) =>
+                current.map((book) => book.id === updatedBook.id ? updatedBook : book)
+            );
+            } else {
+            const savedBook = await createBook({
+                ...bookDetails,
+                ...changes,
+                pagesRead: 0,
+            });
+
+            setBooks((current) => [...current, fromApiBook(savedBook)]);
+            }
+        } catch (err) {
+            setError(err.message || 'Could not save the book. Please try again.');
         }
 
-        return [
-            ...currentBooks,
-            {
-            ...incomingBook,
-            id: window.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`,
-            },
-        ];
-        });
         setTitle('');
         setAuthor('');
         setRating('');
@@ -166,6 +185,12 @@ export function Bookshelf({ userName }) {
             <section className="column">
                 <h2>Add a book</h2>
                 <p>Enter the title and choose which shelf it belongs on.</p>
+
+                {error && (
+                    <p className="alert alert-danger" role="alert">
+                        {error}
+                    </p>
+                )}
 
                 <form onSubmit={handleSubmit}>
                     <div>
