@@ -8,10 +8,11 @@ const authCookieName = 'token';
 
 // The scores and users are saved in memory and disappear whenever the service is restarted.
 let users = [];
-let scores = [];
+let books  = [];
+let friendRequests = [];
 
 // The service port. In production the front-end code is statically hosted by the service on the same port.
-const port = process.argv.length > 2 ? process.argv[2] : 3000;
+const port = process.argv.length > 2 ? process.argv[2] : 4000;
 
 // JSON body parsing using built-in middleware
 app.use(express.json());
@@ -62,14 +63,47 @@ apiRouter.delete('/auth/logout', async (req, res) => {
   res.status(204).end();
 });
 
+//get the books for a given user. The user must be logged in to get their books. The user is identified by the token in the cookie.
+apiRouter.get('/books', verifyAuth, (req, res) => {
+  const myBooks = books.filter((book) => book.userId === req.user.id);
+  res.send(myBooks);
+});
+
+//create a new book for a given user and their shelf
+apiRouter.post('/books', verifyAuth, (req, res) => {
+  const { title, author, coverUrl, googleBooksId, shelf, totalPages } = req.body;
+  const validShelves = ['to-read', 'reading', 'read'];
+
+  if (!title || !validShelves.includes(shelf)) {
+    return res.status(400).send({ msg: 'Title and valid shelf are required' });
+  }
+
+  const book = {
+    id: uuid.v4(),
+    userId: req.user.id,
+    googleBooksId,
+    title,
+    author : author ?? '',
+    coverUrl: coverUrl ?? '',
+    shelf,
+    pagesRead: 0,
+    totalPages: totalPages ?? 0,
+    rating: null,
+  };
+
+  books.push(book);
+  res.status(201).send(book);
+});
+
 // Middleware to verify that the user is authorized to call an endpoint
 const verifyAuth = async (req, res, next) => {
   const user = await findUser('token', req.cookies[authCookieName]);
-  if (user) {
-    next();
-  } else {
-    res.status(401).send({ msg: 'Unauthorized' });
+  if (!user) {
+    return res.status(401).send({ msg: 'Unauthorized' });
   }
+
+  req.user = user;
+  next();
 };
 
 
@@ -87,6 +121,7 @@ async function createUser(email, password) {
   const passwordHash = await bcrypt.hash(password, 10);
 
   const user = {
+    id: uuid.v4(),
     email: email,
     password: passwordHash,
     token: uuid.v4(),
@@ -106,7 +141,8 @@ async function findUser(field, value) {
 function setAuthCookie(res, authToken) {
   res.cookie(authCookieName, authToken, {
     maxAge: 1000 * 60 * 60 * 24 * 365,
-    secure: true,
+    //secure: true,
+    secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
     sameSite: 'strict',
   });
