@@ -63,6 +63,18 @@ apiRouter.delete('/auth/logout', async (req, res) => {
   res.status(204).end();
 });
 
+// Middleware to verify that the user is authorized to call an endpoint
+const verifyAuth = async (req, res, next) => {
+  const user = await findUser('token', req.cookies[authCookieName]);
+  if (!user) {
+    return res.status(401).send({ msg: 'Unauthorized' });
+  }
+
+  req.user = user;
+  next();
+};
+
+
 //get the books for a given user. The user must be logged in to get their books. The user is identified by the token in the cookie.
 apiRouter.get('/books', verifyAuth, (req, res) => {
   const myBooks = books.filter((book) => book.userId === req.user.id);
@@ -95,17 +107,50 @@ apiRouter.post('/books', verifyAuth, (req, res) => {
   res.status(201).send(book);
 });
 
-// Middleware to verify that the user is authorized to call an endpoint
-const verifyAuth = async (req, res, next) => {
-  const user = await findUser('token', req.cookies[authCookieName]);
-  if (!user) {
-    return res.status(401).send({ msg: 'Unauthorized' });
+//patch a different shelf, pagesRead, or rating for a given book. The user must be logged in to update their books. The user is identified by the token in the cookie.
+apiRouter.patch('/books/:id', verifyAuth, (req, res) => {
+  const book = books.find((b) => b.id === req.params.id && b.userId === req.user.id);
+  if (!book) {
+    return res.status(404).send({ msg: 'Book not found' });
   }
 
-  req.user = user;
-  next();
-};
+  const { shelf, pagesRead, rating } = req.body;
+  const validShelves = ['to-read', 'reading', 'read'];
 
+  if (shelf !== undefined && !validShelves.includes(shelf)) {
+    return res.status(400).send({ msg: 'Invalid shelf' });
+  }
+
+  if (pagesRead !== undefined) {
+    if (!Number.isInteger(pagesRead) || pagesRead < 0 || pagesRead > book.totalPages) {
+      return res.status(400).send({ msg: 'Invalid pagesRead' });
+    }
+    book.pagesRead = pagesRead;
+  }
+
+  if (rating !== undefined) {
+    // Adjust this range if your UI uses a different rating scale.
+    if (rating !== null && (!Number.isFinite(rating) || rating < 1 || rating > 5)) {
+      return res.status(400).send({ msg: 'Invalid rating' });
+    }
+    book.rating = rating;
+  }
+
+  if (shelf !== undefined) book.shelf = shelf;
+
+  res.send(book);
+});
+
+//delete a book for a given user. The user must be logged in to delete their books. The user is identified by the token in the cookie.
+apiRouter.delete('/books/:id', verifyAuth, (req, res) => {
+  const bookIndex = books.findIndex((b) => b.id === req.params.id && b.userId === req.user.id);
+  if (bookIndex === -1) {
+    return res.status(404).send({ msg: 'Book not found' });
+  }
+
+  books.splice(bookIndex, 1);
+  res.status(204).end();
+});
 
 // Default error handler
 app.use(function (err, req, res, next) {
