@@ -54,7 +54,6 @@ export function Unauthenticated({ userName, onLogin }) {
 
       const displayName = result.username || result.email || normalizedEmail;
 
-      // The auth token stays in the backend's HttpOnly cookie.
       localStorage.setItem('userName', displayName);
       onLogin(displayName);
       navigate('/dashboard');
@@ -85,7 +84,7 @@ export function Unauthenticated({ userName, onLogin }) {
           type="text"
           value={username}
           onChange={(event) => setUsername(event.target.value)}
-          placeholder="Used for friend requests; required to register"
+          placeholder="Required to register; used for friend requests"
         />
       </div>
 

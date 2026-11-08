@@ -46,7 +46,7 @@ apiRouter.post('/auth/create', async (req, res) => {
 
   const user = await createUser(email, username, password);
   setAuthCookie(res, user.token);
-  res.send({ email: user.email, username: user.username });
+  res.status(201).send({ email: user.email, username: user.username });
 });
 
 // GetAuth login an existing user
