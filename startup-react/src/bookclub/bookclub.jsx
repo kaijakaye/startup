@@ -3,6 +3,7 @@ import { progressPercent, shelfType } from '../bookshelf/bookshelfData';
 import {
   createClub,
   getClubDetails,
+  inviteFriendToClub,
   listBooksForUser,
   listClubs,
   listFriends,
@@ -26,6 +27,8 @@ export function BookClub({ userName }) {
   const [selectedFriends, setSelectedFriends] = useState([]);
   const [selectedBook, setSelectedBook] = useState('');
   const [message, setMessage] = useState('');
+  const [inviteClubId, setInviteClubId] = useState('');
+  const [inviteFriendIds, setInviteFriendIds] = useState([]);
 
   async function refresh() {
     if (!userName) return;
@@ -146,6 +149,38 @@ export function BookClub({ userName }) {
     await refresh();
   }
 
+  // ADD THE NEW HANDLER HERE
+  async function handleInviteToExistingClub(event) {
+    event.preventDefault();
+
+    const invitees = friends.filter((friend) =>
+      inviteFriendIds.includes(friend.id)
+    );
+
+    if (!inviteClubId || invitees.length === 0) {
+      setMessage('Choose a club and at least one friend.');
+      return;
+    }
+
+    try {
+      for (const friend of invitees) {
+        await inviteFriendToClub(inviteClubId, friend.username);
+      }
+
+      setInviteFriendIds([]);
+      setMessage('Invitations sent.');
+      await refresh();
+    } catch (error) {
+      setMessage(error.message || 'Could not send the invitations.');
+    }
+  }
+
+  async function handleInviteResponse(clubId, accepted) {
+    await respondToClubInvite(clubId, userName, accepted);
+    if (accepted) setActiveClubId(clubId);
+    await refresh();
+  }
+
   async function handleInviteResponse(clubId, accepted) {
     await respondToClubInvite(clubId, userName, accepted);
     if (accepted) setActiveClubId(clubId);
@@ -200,7 +235,7 @@ export function BookClub({ userName }) {
                   checked={selectedFriends.includes(friend.id)}
                   onChange={() => toggleFriend(friend.id)}
                 />
-                {' '}{friend.displayName}
+                {' '}{friend.username}
               </label>
             ))}
           </fieldset>
@@ -210,14 +245,72 @@ export function BookClub({ userName }) {
         {message && <p role="status">{message}</p>}
       </section>
 
-      {pendingInvites.length > 0 && (
-        <section>
-          <h3>Club invitations</h3>
-          {pendingInvites.map(club => (
+      <section className="column">
+        <h3>Invite friends to an existing club</h3>
+
+        <form onSubmit={handleInviteToExistingClub}>
+          <label htmlFor="invite-club">Choose a club:</label>
+          <select
+            id="invite-club"
+            value={inviteClubId}
+            onChange={(event) => setInviteClubId(event.target.value)}
+            required
+          >
+            <option value="">Select a club</option>
+            {clubs
+              .filter(
+                (club) =>
+                  club.memberStatus === 'accepted'
+              )
+              .map((club) => (
+                <option key={club.id} value={club.id}>
+                  {club.name}
+                </option>
+              ))}
+          </select>
+
+          <fieldset>
+            <legend>Choose friends to invite</legend>
+            {friends.length === 0 && <p>Add friends in Book Buzz first.</p>}
+            {friends.map((friend) => (
+              <label key={friend.id} className="d-block">
+                <input
+                  type="checkbox"
+                  checked={inviteFriendIds.includes(friend.id)}
+                  onChange={() =>
+                    setInviteFriendIds((current) =>
+                      current.includes(friend.id)
+                        ? current.filter((id) => id !== friend.id)
+                        : [...current, friend.id]
+                    )
+                  }
+                />
+                {' '}{friend.username}
+              </label>
+            ))}
+          </fieldset>
+
+          <button className="btn btn-success" type="submit">
+            Send invitations
+          </button>
+        </form>
+      </section>
+
+      <section>
+        <h3>Club invitations</h3>
+
+        {pendingInvites.length === 0 ? (
+          <p>You have no pending club invitations.</p>
+        ) : (
+          pendingInvites.map((club) => (
             <article className="column" key={club.id}>
-              <p>You’re invited to <strong>{club.name}</strong>.</p>
+              <p>
+                You’re invited to <strong>{club.name}</strong>.
+              </p>
+
               <button
                 className="btn btn-success"
+                type="button"
                 onClick={() => handleInviteResponse(club.id, true)}
               >
                 Accept
@@ -225,14 +318,15 @@ export function BookClub({ userName }) {
               {' '}
               <button
                 className="btn btn-secondary"
+                type="button"
                 onClick={() => handleInviteResponse(club.id, false)}
               >
                 Decline
               </button>
             </article>
-          ))}
-        </section>
-      )}
+          ))
+        )}
+      </section>
 
       {clubs.some(club => club.memberStatus === 'accepted') && (
         <section>
@@ -305,49 +399,3 @@ export function BookClub({ userName }) {
     </main>
   );
 }
-
-/*export function BookClub() {
-  return (
-    <main>
-      <h2>Current Book: <i>East of Eden</i></h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Reader</th>
-            <th>Progress</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Kaija Sorensen</td>
-            <td><label for="reading-progress">Reading Progress:</label> <progress id="reading-progress" value="65" max="100"></progress></td>
-          </tr>
-          <tr>
-            <td>Abby Gugler</td>
-            <td><label for="reading-progress-2">Reading Progress:</label> <progress id="reading-progress-2" value="30" max="100"></progress></td>
-          </tr>
-          <tr>
-            <td>Cora Atkinson</td>
-            <td><label for="reading-progress-3">Reading Progress:</label> <progress id="reading-progress-3" value="45" max="100"></progress></td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h3>Add a Book Club Read</h3>
-                <p>Enter the title of a book to read as a group</p>
-                <form method="get" action="bookshelf.html">
-                    <div>
-                    <input type="text" placeholder="Search for a book title..." />
-                    </div>
-                    <div className="api-book-result">
-                    </div>
-                    <select id="options-clubs" name="options-clubs" placeholder="Select a book club group to read this with">
-                        <option value="Girlfriends">Girlfriends</option>
-                        <option value="Family">Family</option>
-                        <option value="Work Besties">Work Besties</option>
-                    </select><br></br>
-                    <button className="btn btn-success" type="submit">Add to Book Club</button>
-                </form>
-    </main>
-  );
-}*/

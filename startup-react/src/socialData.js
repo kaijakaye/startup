@@ -59,6 +59,13 @@ export function respondToFriendRequest(requestId, accepted) {
   );
 }
 
+export function inviteFriendToClub(clubId, username) {
+  return apiRequest(
+    `/clubs/${encodeURIComponent(clubId)}/invites`,
+    jsonOptions('POST', { username })
+  );
+}
+
 // These use the planned club routes. They will work after those backend
 // routes are implemented.
 export function listClubs() {
