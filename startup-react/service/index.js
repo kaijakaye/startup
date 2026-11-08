@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const express = require('express');
 const uuid = require('uuid');
 const app = express();
+require('dotenv').config();
 
 const authCookieName = 'token';
 
@@ -29,8 +30,66 @@ app.use(express.static('public'));
 var apiRouter = express.Router();
 app.use(`/api`, apiRouter);
 
+function asyncHandler(handler) {
+  return async (req, res, next) => {
+    try {
+      await handler(req, res, next);
+    } catch (error) {
+      next(error);
+    }
+  };
+}
+
+apiRouter.get('/books/search', asyncHandler(async (req, res) => {
+  const title = String(req.query.title ?? '').trim();
+  const author = String(req.query.author ?? '').trim();
+  const apiKey = process.env.GOOGLE_BOOKS_API_KEY;
+
+  if (!title) {
+    return res.status(400).send({ msg: 'Book title is required' });
+  }
+
+  if (!apiKey) {
+    const error = new Error('Google Books API key is not configured on the server');
+    error.status = 500;
+    throw error;
+  }
+
+  const query = [
+    `intitle:${title}`,
+    author && `inauthor:${author}`,
+  ].filter(Boolean).join(' ');
+
+  const googleUrl = new URL('https://www.googleapis.com/books/v1/volumes');
+  googleUrl.searchParams.set('q', query);
+  googleUrl.searchParams.set('maxResults', '1');
+  googleUrl.searchParams.set('key', apiKey);
+
+  const googleResponse = await fetch(googleUrl);
+
+  if (!googleResponse.ok) {
+    const error = new Error('Google Books search failed');
+    error.status = 502;
+    throw error;
+  }
+
+  const data = await googleResponse.json();
+  const volume = data.items?.[0];
+  const info = volume?.volumeInfo;
+
+  const book = {
+    googleBooksId: volume?.id ?? null,
+    title: info?.title ?? title,
+    author: author || info?.authors?.join(', ') || 'Unknown author',
+    coverUrl: info?.imageLinks?.thumbnail?.replace(/^http:/, 'https:') ?? '',
+    totalPages: info?.pageCount ?? null,
+  };
+
+  res.send({ book });
+}));
+
 // CreateAuth a new user
-apiRouter.post('/auth/create', async (req, res) => {
+apiRouter.post('/auth/create', asyncHandler(async (req, res) => {
   const email = String(req.body.email ?? '').trim().toLowerCase();
   const username = String(req.body.username ?? '').trim().toLowerCase();
   const password = req.body.password;
@@ -49,10 +108,10 @@ apiRouter.post('/auth/create', async (req, res) => {
   const user = await createUser(email, username, password);
   setAuthCookie(res, user.token);
   res.status(201).send({ email: user.email, username: user.username });
-});
+}));
 
 // GetAuth login an existing user
-apiRouter.post('/auth/login', async (req, res) => {
+apiRouter.post('/auth/login', asyncHandler(async (req, res) => {
   const email = String(req.body.email ?? '').trim().toLowerCase();
   const user = await findUser('email', email);
 
@@ -63,20 +122,20 @@ apiRouter.post('/auth/login', async (req, res) => {
   }
 
   res.status(401).send({ msg: 'Unauthorized' });
-});
+}));
 
 // DeleteAuth logout a user
-apiRouter.delete('/auth/logout', async (req, res) => {
+apiRouter.delete('/auth/logout', asyncHandler(async (req, res) => {
   const user = await findUser('token', req.cookies[authCookieName]);
   if (user) {
     delete user.token;
   }
   res.clearCookie(authCookieName);
   res.status(204).end();
-});
+}));
 
 // Middleware to verify that the user is authorized to call an endpoint
-const verifyAuth = async (req, res, next) => {
+const verifyAuth = asyncHandler(async (req, res, next) => {
   const user = await findUser('token', req.cookies[authCookieName]);
   if (!user) {
     return res.status(401).send({ msg: 'Unauthorized' });
@@ -84,7 +143,7 @@ const verifyAuth = async (req, res, next) => {
 
   req.user = user;
   next();
-};
+});
 
 // Create a club. The creator is its first accepted member and owner.
 apiRouter.post('/clubs', verifyAuth, (req, res) => {
@@ -302,7 +361,7 @@ apiRouter.delete('/books/:id', verifyAuth, (req, res) => {
   res.status(204).end();
 });
 
-apiRouter.post('/friends/requests', verifyAuth, async (req, res) => {
+apiRouter.post('/friends/requests', verifyAuth, asyncHandler(async (req, res) => {
   const username = String(req.body.username ?? '').trim().toLowerCase();
 
   if (!username) {
@@ -343,7 +402,7 @@ apiRouter.post('/friends/requests', verifyAuth, async (req, res) => {
 
   friendRequests.push(request);
   res.status(201).send({ id: request.id, status: request.status });
-});
+}));
 
 apiRouter.get('/friends/requests', verifyAuth, (req, res) => {
   const pending = friendRequests
@@ -454,13 +513,22 @@ apiRouter.get('/friends/:username/books', verifyAuth, (req, res) => {
 });
 
 // Default error handler
-app.use(function (err, req, res, next) {
-  res.status(500).send({ type: err.name, message: err.message });
-});
+app.use((err, req, res, next) => {
+  if (res.headersSent) {
+    return next(err);
+  }
 
-// Return the application's default page if the path is unknown
-app.use((_req, res) => {
-  res.sendFile('index.html', { root: 'public' });
+  console.error(err);
+
+  const status = err.status || 500;
+  const message =
+    status === 500 ? 'Internal server error' : err.message;
+
+  res.status(status).send({
+    type: err.name || 'Error',
+    message,
+    msg: message,
+  });
 });
 
 async function createUser(email, username, password) {
