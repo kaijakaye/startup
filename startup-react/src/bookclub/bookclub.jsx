@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { progressPercent, shelfType } from '../bookshelf/bookshelfData';
 import {
   createClub,
-  ensureLocalUser,
   getClubDetails,
   listBooksForUser,
   listClubs,
@@ -31,10 +30,9 @@ export function BookClub({ userName }) {
   async function refresh() {
     if (!userName) return;
 
-    await ensureLocalUser(userName);
     const [nextFriends, nextClubs] = await Promise.all([
-      listFriends(userName),
-      listClubs(userName),
+      listFriends(),
+      listClubs(),
     ]);
 
     setFriends(nextFriends);

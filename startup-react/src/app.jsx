@@ -9,22 +9,26 @@ import { Bookshelf } from './bookshelf/bookshelf';
 import { BookBuzz } from './bookbuzz/bookbuzz';
 import { BookClub } from './bookclub/bookclub';
 import { BookProgress } from './bookprogress/bookprogress';
-import { ensureLocalUser } from './socialData';
 
 function App() {
   const [userName, setUserName] = React.useState(localStorage.getItem('userName') || '');
   const currentAuthState = userName ? AuthState.Authenticated : AuthState.Unauthenticated;
   const [authState, setAuthState] = React.useState(currentAuthState);
 
-  function logout() {
+  async function logout() {
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+    } catch (error) {
+      console.error('Logout request failed:', error);
+    }
+
     localStorage.removeItem('userName');
     setUserName('');
     setAuthState(AuthState.Unauthenticated);
   }
-
-  React.useEffect(() => {
-    if (userName) void ensureLocalUser(userName);
-  }, [userName]);
 
   return (
     <BrowserRouter>
@@ -87,27 +91,44 @@ function App() {
         </header>
 
         <Routes>
-          <Route path="*" element={<Navigate to="/login" replace />} />
+          <Route path="/" element={<Navigate to="/login" replace />} />
+
           <Route
-            path='/login'
+            path="/login"
             element={
               <Login
                 userName={userName}
                 authState={authState}
-                onAuthChange={(userName, authState) => {
-                  setUserName(userName);
-                  setAuthState(authState);
+                onAuthChange={(nextUserName, nextAuthState) => {
+                  setUserName(nextUserName);
+                  setAuthState(nextAuthState);
                 }}
               />
             }
-            exact
           />
-          <Route path='/dashboard' element={<Dashboard key={userName} userName={userName} />} />
-          <Route path='/bookshelf' element={<Bookshelf key={userName} userName={userName} />}/>
-          <Route path='/bookbuzz' element={<BookBuzz key={userName} userName={userName} />} />
-          <Route path='/bookclub' element={<BookClub key={userName} userName={userName} />} />
-          <Route path='/bookprogress' element={<BookProgress key={userName} userName={userName} />} />
-          <Route path='*' element={<NotFound />} />
+
+          <Route
+            path="/dashboard"
+            element={<Dashboard key={userName} userName={userName} />}
+          />
+          <Route
+            path="/bookshelf"
+            element={<Bookshelf key={userName} userName={userName} />}
+          />
+          <Route
+            path="/bookbuzz"
+            element={<BookBuzz key={userName} userName={userName} />}
+          />
+          <Route
+            path="/bookclub"
+            element={<BookClub key={userName} userName={userName} />}
+          />
+          <Route
+            path="/bookprogress"
+            element={<BookProgress key={userName} userName={userName} />}
+          />
+
+          <Route path="*" element={<NotFound />} />
         </Routes>
 
         <footer>

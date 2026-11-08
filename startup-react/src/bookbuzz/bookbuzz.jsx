@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { progressPercent, shelfType } from '../bookshelf/bookshelfData';
 import {
-  ensureLocalUser,
   listBooksForUser,
   listFriends,
   listIncomingFriendRequests,
@@ -34,10 +33,9 @@ export function BookBuzz({ userName }) {
   async function refresh() {
     if (!userName) return;
 
-    await ensureLocalUser(userName);
     const [nextFriends, nextRequests] = await Promise.all([
-      listFriends(userName),
-      listIncomingFriendRequests(userName),
+      listFriends(),
+      listIncomingFriendRequests(),
     ]);
 
     const feeds = await Promise.all(nextFriends.map(async friend => {
@@ -94,7 +92,7 @@ export function BookBuzz({ userName }) {
   return (
     <main>
       <h2>Book Buzz</h2>
-      <p>See what your friends are reading and what they think about it.</p>
+      <p>See what your friends are reading.</p>
 
       <section className="column">
         <h3>Add a friend</h3>
@@ -116,7 +114,7 @@ export function BookBuzz({ userName }) {
           <h3>Friend requests</h3>
           {requests.map(request => (
             <article className="column" key={request.id}>
-              <p>{request.sender.displayName} wants to be your friend.</p>
+              <p>{request.username} wants to be your friend.</p>
               <button
                 className="btn btn-success"
                 onClick={() => handleRequestResponse(request.id, true)}
@@ -136,7 +134,7 @@ export function BookBuzz({ userName }) {
       )}
 
       <section>
-        <h3>Friends’ activity</h3>
+        <h2>Friends Activity</h2>
         {friends.length === 0 && <p>You haven’t added any friends yet.</p>}
         {friends.length > 0 && activity.length === 0 && (
           <p>Your friends haven’t added current or finished books yet.</p>
@@ -149,7 +147,7 @@ export function BookBuzz({ userName }) {
 
             return (
               <article className="column" key={`${friend.id}-${book.id}`}>
-                <h3>{friend.displayName}</h3>
+                <h3>{friend.username}</h3>
                 <p>
                   {shelf === 'reading' ? 'Reading' : 'Finished'}: <i>{book.title}</i>
                 </p>

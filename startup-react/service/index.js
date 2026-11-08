@@ -280,6 +280,39 @@ apiRouter.get('/friends', verifyAuth, (req, res) => {
   res.send(friends);
 });
 
+apiRouter.get('/friends/:username/books', verifyAuth, (req, res) => {
+  const username = req.params.username.toLowerCase();
+  const friend = users.find((user) => user.username === username);
+
+  if (!friend) {
+    return res.status(404).send({ msg: 'User not found' });
+  }
+
+  const isFriend = friendRequests.some(
+    (request) =>
+      request.status === 'accepted' &&
+      (
+        (request.requesterId === req.user.id &&
+          request.recipientId === friend.id) ||
+        (request.requesterId === friend.id &&
+          request.recipientId === req.user.id)
+      )
+  );
+
+  if (!isFriend) {
+    return res.status(403).send({ msg: 'You are not friends with this user' });
+  }
+
+  const friendBooks = books
+    .filter((book) => book.userId === friend.id)
+    .map((book) => ({
+      ...book,
+      friendUsername: friend.username,
+    }));
+
+  res.send(friendBooks);
+});
+
 // Default error handler
 app.use(function (err, req, res, next) {
   res.status(500).send({ type: err.name, message: err.message });
