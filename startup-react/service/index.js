@@ -23,12 +23,12 @@ app.use(express.json());
 // Use the cookie parser middleware for tracking authentication tokens
 app.use(cookieParser());
 
-// Serve up the front-end static content hosting
-app.use(express.static('public'));
-
 // Router for service endpoints
 var apiRouter = express.Router();
 app.use(`/api`, apiRouter);
+
+// Serve up the front-end static content hosting
+app.use(express.static('public'));
 
 function asyncHandler(handler) {
   return async (req, res, next) => {
