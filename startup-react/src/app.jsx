@@ -10,6 +10,14 @@ import { BookBuzz } from './bookbuzz/bookbuzz';
 import { BookClub } from './bookclub/bookclub';
 import { BookProgress } from './bookprogress/bookprogress';
 
+function RequireAuth({ authState, children }) {
+  if (authState !== AuthState.Authenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+}
+
 function App() {
   const [userName, setUserName] = React.useState(localStorage.getItem('userName') || '');
   const currentAuthState = userName ? AuthState.Authenticated : AuthState.Unauthenticated;
@@ -109,23 +117,43 @@ function App() {
 
           <Route
             path="/dashboard"
-            element={<Dashboard key={userName} userName={userName} />}
+            element={
+              <RequireAuth authState={authState}>
+                <Dashboard key={userName} userName={userName} />
+              </RequireAuth>
+            }
           />
           <Route
             path="/bookshelf"
-            element={<Bookshelf key={userName} userName={userName} />}
+            element={
+              <RequireAuth authState={authState}>
+                <Bookshelf key={userName} userName={userName} />
+              </RequireAuth>
+            }
           />
           <Route
             path="/bookbuzz"
-            element={<BookBuzz key={userName} userName={userName} />}
+            element={
+              <RequireAuth authState={authState}>
+                <BookBuzz key={userName} userName={userName} />
+              </RequireAuth>
+            }
           />
           <Route
             path="/bookclub"
-            element={<BookClub key={userName} userName={userName} />}
+            element={
+              <RequireAuth authState={authState}>
+                <BookClub key={userName} userName={userName} />
+              </RequireAuth>
+            }
           />
           <Route
             path="/bookprogress"
-            element={<BookProgress key={userName} userName={userName} />}
+            element={
+              <RequireAuth authState={authState}>
+                <BookProgress key={userName} userName={userName} />
+              </RequireAuth>
+            }
           />
 
           <Route path="*" element={<NotFound />} />

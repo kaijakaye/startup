@@ -4,6 +4,7 @@ const express = require('express');
 const uuid = require('uuid');
 const app = express();
 require('dotenv').config();
+const path = require('path');
 
 const authCookieName = 'token';
 
@@ -23,12 +24,11 @@ app.use(express.json());
 // Use the cookie parser middleware for tracking authentication tokens
 app.use(cookieParser());
 
+// Serve up the front-end static content hosting
+app.use(express.static(path.join(__dirname, 'public')));
+
 // Router for service endpoints
 var apiRouter = express.Router();
-app.use(`/api`, apiRouter);
-
-// Serve up the front-end static content hosting
-app.use(express.static('public'));
 
 function asyncHandler(handler) {
   return async (req, res, next) => {
@@ -510,6 +510,21 @@ apiRouter.get('/friends/:username/books', verifyAuth, (req, res) => {
     }));
 
   res.send(friendBooks);
+});
+
+app.use(`/api`, apiRouter);
+// Return a JSON 404 for unknown API endpoints.
+app.use('/api', (_req, res) => {
+  res.status(404).send({ msg: 'API endpoint not found' });
+});
+
+// Let React Router handle browser routes such as /bookclub.
+app.use((req, res, next) => {
+  if (req.method !== 'GET') return next();
+
+  res.sendFile(path.join(__dirname, 'public', 'index.html'), (error) => {
+    if (error) next(error);
+  });
 });
 
 // Default error handler
