@@ -8,6 +8,16 @@ const path = require('path');
 
 const authCookieName = 'token';
 
+const {
+  getUser,
+  getUserByUsername,
+  getUserByToken,
+  addUser,
+  updateUser,
+  updateUserRemoveAuth,
+  getUserByUsername
+} = require('./database');
+
 // The scores and users are saved in memory and disappear whenever the service is restarted.
 let users = [];
 let books  = [];
@@ -117,6 +127,7 @@ apiRouter.post('/auth/login', asyncHandler(async (req, res) => {
 
   if (user && await bcrypt.compare(req.body.password, user.password)) {
     user.token = uuid.v4();
+    await updateUser(user);
     setAuthCookie(res, user.token);
     return res.send({ email: user.email, username: user.username });
   }
@@ -128,7 +139,7 @@ apiRouter.post('/auth/login', asyncHandler(async (req, res) => {
 apiRouter.delete('/auth/logout', asyncHandler(async (req, res) => {
   const user = await findUser('token', req.cookies[authCookieName]);
   if (user) {
-    delete user.token;
+    await updateUserRemoveAuth(user);
   }
   res.clearCookie(authCookieName);
   res.status(204).end();
@@ -557,14 +568,18 @@ async function createUser(email, username, password) {
     token: uuid.v4(),
   };
 
-  users.push(user);
+  await addUser(user);
   return user;
 }
 
 async function findUser(field, value) {
   if (!value) return null;
 
-  return users.find((u) => u[field] === value);
+  if (field === 'email') return getUser(value);
+  if (field === 'username') return getUserByUsername(value);
+  if (field === 'token') return getUserByToken(value);
+
+  return null;
 }
 
 // setAuthCookie in the HTTP response
