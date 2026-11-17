@@ -9,6 +9,9 @@ const client = new MongoClient(url);
 const db = client.db('startup');
 const userCollection = db.collection('user');
 const bookCollection = db.collection('book');
+const friendRequestCollection = db.collection('friendRequest');
+const clubCollection = db.collection('club');
+const clubMemberCollection = db.collection('clubMember');
 
 // This will asynchronously test the connection and exit the process if it fails
 (async function testConnection() {
@@ -69,6 +72,54 @@ async function deleteBookForUser(userId, bookId) {
 
 async function findBookForUser(userId, bookId) {
   return bookCollection.findOne({ id: bookId, userId });
+}
+
+async function addFriendRequest(request) {
+  return friendRequestCollection.insertOne(request);
+}
+
+async function getFriendRequestsForUser(userId) {
+  return friendRequestCollection.find({ $or: [{ requesterId: userId }, { recipientId: userId }] }).toArray();
+}
+
+async function findActiveFriendRequestBetween(userA, userB) {
+  return friendRequestCollection.findOne({
+    status: { $in: ['pending', 'accepted'] },
+    $or: [
+      { requesterId: userA, recipientId: userB },
+      { requesterId: userB, recipientId: userA },
+    ],
+  });
+}
+
+async function findAcceptedFriendshipBetween(userA, userB) {
+  return friendRequestCollection.findOne({
+    status: 'accepted',
+    $or: [
+      { requesterId: userA, recipientId: userB },
+      { requesterId: userB, recipientId: userA },
+    ],
+  });
+}
+
+async function getFriendRequestById(id){
+  return friendRequestCollection.findOne({ id });
+}
+
+async function getPendingFriendRequestsForUser(userId) {
+  return friendRequestCollection.find({ status: 'pending',
+    $or: [{ requesterId: userId }, { recipientId: userId }],
+   }).toArray();
+}
+
+async function getAcceptedFriendRequestsForUser(userId) {
+  return friendRequestCollection.find({ status: 'accepted',
+    $or: [{ requesterId: userId }, { recipientId: userId }],
+   }).toArray();
+}
+
+async function updateFriendRequestStatus(id, recipientId, status) {
+  return friendRequestCollection.updateOne({ id, recipientId, status: 'pending' }, { $set: { status } });
 }
 
 module.exports = {
