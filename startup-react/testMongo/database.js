@@ -55,6 +55,14 @@ async function addBookForUser(userId, book) {
   return bookCollection.insertOne({ ...book, userId });
 }
 
+async function updateBookForUser(userId, bookId, updates) {
+  return bookCollection.updateOne({ id: bookId, userId }, { $set: updates });
+}
+
+async function deleteBookForUser(userId, bookId) {
+  return bookCollection.deleteOne({ id: bookId, userId });
+}
+
 module.exports = {
   getUser,
   getUserByToken,
@@ -64,4 +72,6 @@ module.exports = {
   getBooksForUser,
   addBookForUser,
   getUserByUsername,
+  updateBookForUser,
+  deleteBookForUser,
 };

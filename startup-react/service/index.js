@@ -15,7 +15,11 @@ const {
   addUser,
   updateUser,
   updateUserRemoveAuth,
-  getUserByUsername
+  getUserByUsername,
+  getBooksForUser,
+  addBookForUser,
+  updateBookForUser,
+  deleteBookForUser,
 } = require('./database');
 
 // The scores and users are saved in memory and disappear whenever the service is restarted.
@@ -328,14 +332,15 @@ apiRouter.post('/books', verifyAuth, (req, res) => {
 });
 
 //patch a different shelf, pagesRead, or rating for a given book. The user must be logged in to update their books. The user is identified by the token in the cookie.
-apiRouter.patch('/books/:id', verifyAuth, (req, res) => {
-  const book = books.find((b) => b.id === req.params.id && b.userId === req.user.id);
+apiRouter.patch('/books/:id', verifyAuth, asyncHandler(async (req, res) => {
+  const book = await findBookForUser(req.user.id, req.params.id);
   if (!book) {
     return res.status(404).send({ msg: 'Book not found' });
   }
 
   const { shelf, pagesRead, rating } = req.body;
   const validShelves = ['to-read', 'reading', 'read'];
+  const updates = {};
 
   if (shelf !== undefined && !validShelves.includes(shelf)) {
     return res.status(400).send({ msg: 'Invalid shelf' });
@@ -345,7 +350,7 @@ apiRouter.patch('/books/:id', verifyAuth, (req, res) => {
     if (!Number.isInteger(pagesRead) || pagesRead < 0 || pagesRead > book.totalPages) {
       return res.status(400).send({ msg: 'Invalid pagesRead' });
     }
-    book.pagesRead = pagesRead;
+    updates.pagesRead = pagesRead;
   }
 
   if (rating !== undefined) {
@@ -353,24 +358,31 @@ apiRouter.patch('/books/:id', verifyAuth, (req, res) => {
     if (rating !== null && (!Number.isFinite(rating) || rating < 1 || rating > 5)) {
       return res.status(400).send({ msg: 'Invalid rating' });
     }
-    book.rating = rating;
+    updates.rating = rating;
   }
 
-  if (shelf !== undefined) book.shelf = shelf;
+  if (shelf !== undefined) updates.shelf = shelf;
 
-  res.send(book);
-});
+  const updatedBook = await updateBookForUser(req.user.id, req.params.id, updates);
 
-//delete a book for a given user. The user must be logged in to delete their books. The user is identified by the token in the cookie.
-apiRouter.delete('/books/:id', verifyAuth, (req, res) => {
-  const bookIndex = books.findIndex((b) => b.id === req.params.id && b.userId === req.user.id);
-  if (bookIndex === -1) {
+  if (!updatedBook) {
     return res.status(404).send({ msg: 'Book not found' });
   }
 
-  books.splice(bookIndex, 1);
-  res.status(204).end();
-});
+  res.send(updatedBook);
+}));
+
+//delete a book for a given user. The user must be logged in to delete their books. The user is identified by the token in the cookie.
+apiRouter.delete('/books/:id',verifyAuth,asyncHandler(async (req, res) => {
+    const result = await deleteBookForUser(req.user.id, req.params.id);
+
+    if (result.deletedCount === 0) {
+      return res.status(404).send({ msg: 'Book not found' });
+    }
+
+    res.status(204).end();
+  })
+);
 
 apiRouter.post('/friends/requests', verifyAuth, asyncHandler(async (req, res) => {
   const username = String(req.body.username ?? '').trim().toLowerCase();
