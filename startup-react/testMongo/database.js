@@ -34,6 +34,10 @@ function getUserByUsername(username) {
   return userCollection.findOne({ username });
 }
 
+function getUserById(id) {
+  return userCollection.findOne({ id });
+}
+
 async function addUser(user) {
   await userCollection.insertOne(user);
 }
@@ -63,6 +67,10 @@ async function deleteBookForUser(userId, bookId) {
   return bookCollection.deleteOne({ id: bookId, userId });
 }
 
+async function findBookForUser(userId, bookId) {
+  return bookCollection.findOne({ id: bookId, userId });
+}
+
 module.exports = {
   getUser,
   getUserByToken,
@@ -72,6 +80,8 @@ module.exports = {
   getBooksForUser,
   addBookForUser,
   getUserByUsername,
+  getUserById,
   updateBookForUser,
   deleteBookForUser,
+  findBookForUser
 };

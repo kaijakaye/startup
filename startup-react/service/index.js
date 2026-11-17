@@ -12,19 +12,18 @@ const {
   getUser,
   getUserByUsername,
   getUserByToken,
+  getUserById,
   addUser,
   updateUser,
   updateUserRemoveAuth,
-  getUserByUsername,
   getBooksForUser,
   addBookForUser,
   updateBookForUser,
   deleteBookForUser,
+  findBookForUser,
 } = require('./database');
 
-// The scores and users are saved in memory and disappear whenever the service is restarted.
-let users = [];
-let books  = [];
+//old archaic data structures
 let friendRequests = [];
 let clubs = [];
 let clubMembers = [];
@@ -208,7 +207,7 @@ apiRouter.get('/clubs', verifyAuth, (req, res) => {
 });
 
 // Invite an accepted friend to a club.
-apiRouter.post('/clubs/:id/invites', verifyAuth, (req, res) => {
+apiRouter.post('/clubs/:id/invites', verifyAuth, async (req, res) => {
   const club = clubs.find((item) => item.id === req.params.id);
 
   if (!club) {
@@ -227,7 +226,7 @@ apiRouter.post('/clubs/:id/invites', verifyAuth, (req, res) => {
   }
 
   const username = String(req.body.username ?? '').trim().toLowerCase();
-  const invitee = users.find((user) => user.username === username);
+  const invitee = await findUser('username', username);
 
   if (!invitee) {
     return res.status(404).send({ msg: 'User not found' });
@@ -300,13 +299,13 @@ apiRouter.patch('/clubs/:id/invites/respond', verifyAuth, (req, res) => {
 
 
 //get the books for a given user. The user must be logged in to get their books. The user is identified by the token in the cookie.
-apiRouter.get('/books', verifyAuth, (req, res) => {
-  const myBooks = books.filter((book) => book.userId === req.user.id);
+apiRouter.get('/books', verifyAuth, asyncHandler(async (req, res) => {
+  const myBooks = await getBooksForUser(req.user.id);
   res.send(myBooks);
-});
+}));
 
 //create a new book for a given user and their shelf
-apiRouter.post('/books', verifyAuth, (req, res) => {
+apiRouter.post('/books', verifyAuth, asyncHandler(async (req, res) => {
   const { title, author, coverUrl, googleBooksId, shelf, totalPages } = req.body;
   const validShelves = ['to-read', 'reading', 'read'];
 
@@ -327,9 +326,9 @@ apiRouter.post('/books', verifyAuth, (req, res) => {
     rating: null,
   };
 
-  books.push(book);
+  await addBookForUser(req.user.id, book);
   res.status(201).send(book);
-});
+}));
 
 //patch a different shelf, pagesRead, or rating for a given book. The user must be logged in to update their books. The user is identified by the token in the cookie.
 apiRouter.patch('/books/:id', verifyAuth, asyncHandler(async (req, res) => {
@@ -427,31 +426,35 @@ apiRouter.post('/friends/requests', verifyAuth, asyncHandler(async (req, res) =>
   res.status(201).send({ id: request.id, status: request.status });
 }));
 
-apiRouter.get('/friends/requests', verifyAuth, (req, res) => {
-  const pending = friendRequests
-    .filter(
+apiRouter.get('/friends/requests',verifyAuth,asyncHandler(async (req, res) => {
+    const requests = friendRequests.filter(
       (request) =>
         request.status === 'pending' &&
         (request.requesterId === req.user.id ||
           request.recipientId === req.user.id)
-    )
-    .map((request) => {
-      const incoming = request.recipientId === req.user.id;
-      const otherUserId = incoming
-        ? request.requesterId
-        : request.recipientId;
-      const otherUser = users.find((user) => user.id === otherUserId);
+    );
 
-      return {
-        id: request.id,
-        direction: incoming ? 'incoming' : 'outgoing',
-        username: otherUser?.username,
-        createdAt: request.createdAt,
-      };
-    });
+    const pending = await Promise.all(
+      requests.map(async (request) => {
+        const incoming = request.recipientId === req.user.id;
+        const otherUserId = incoming
+          ? request.requesterId
+          : request.recipientId;
 
-  res.send(pending);
-});
+        const otherUser = await findUser('id', otherUserId);
+
+        return {
+          id: request.id,
+          direction: incoming ? 'incoming' : 'outgoing',
+          username: otherUser?.username,
+          createdAt: request.createdAt,
+        };
+      })
+    );
+
+    res.send(pending);
+  })
+);
 
 apiRouter.patch('/friends/requests/:id', verifyAuth, (req, res) => {
   const request = friendRequests.find(
@@ -494,7 +497,7 @@ apiRouter.get('/friends', verifyAuth, (req, res) => {
           ? request.recipientId
           : request.requesterId;
 
-      const friend = users.find((user) => user.id === friendId);
+      const friend = findUser('id', friendId);
       return friend && { id: friend.id, username: friend.username };
     })
     .filter(Boolean);
@@ -502,9 +505,9 @@ apiRouter.get('/friends', verifyAuth, (req, res) => {
   res.send(friends);
 });
 
-apiRouter.get('/friends/:username/books', verifyAuth, (req, res) => {
+apiRouter.get('/friends/:username/books', verifyAuth, asyncHandler(async (req, res) => {
   const username = req.params.username.toLowerCase();
-  const friend = users.find((user) => user.username === username);
+  const friend = findUser('username', username);
 
   if (!friend) {
     return res.status(404).send({ msg: 'User not found' });
@@ -525,15 +528,10 @@ apiRouter.get('/friends/:username/books', verifyAuth, (req, res) => {
     return res.status(403).send({ msg: 'You are not friends with this user' });
   }
 
-  const friendBooks = books
-    .filter((book) => book.userId === friend.id)
-    .map((book) => ({
-      ...book,
-      friendUsername: friend.username,
-    }));
+  const friendBooks = await getBooksForUser(friend.id);
 
   res.send(friendBooks);
-});
+}));
 
 app.use(`/api`, apiRouter);
 // Return a JSON 404 for unknown API endpoints.
@@ -590,6 +588,7 @@ async function findUser(field, value) {
   if (field === 'email') return getUser(value);
   if (field === 'username') return getUserByUsername(value);
   if (field === 'token') return getUserByToken(value);
+  if (field === 'id') return getUserById(value);
 
   return null;
 }
