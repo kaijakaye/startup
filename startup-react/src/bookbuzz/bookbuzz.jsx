@@ -79,14 +79,25 @@ export function BookBuzz({ userName }) {
   async function handleSendRequest(event) {
     event.preventDefault();
     const result = await sendFriendRequest(userName, friendName);
-    setMessage(result.message);
+    try {
+      await sendFriendRequest(userName, friendName);
+      setMessage(`Friend request sent to ${friendName.trim()}.`);
+      setFriendName('');
+      await refresh();
+    } catch (error) {
+      setMessage(error.message || 'Could not send the friend request.');
+    }
     setFriendName('');
     await refresh();
   }
 
   async function handleRequestResponse(requestId, accepted) {
-    await respondToFriendRequest(requestId, userName, accepted);
-    await refresh();
+    try{
+      await respondToFriendRequest(requestId, userName, accepted);
+      await refresh();
+    } catch (error) {
+      setMessage(error.message || 'Could not respond to the friend request.');
+    }
   }
 
   return (

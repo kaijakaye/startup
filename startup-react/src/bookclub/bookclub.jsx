@@ -4,7 +4,6 @@ import {
   createClub,
   getClubDetails,
   inviteFriendToClub,
-  listBooksForUser,
   listClubs,
   listFriends,
   respondToClubInvite,
@@ -81,11 +80,13 @@ export function BookClub({ userName }) {
       const club = await getClubDetails(activeClubId);
       if (!club || !active) return;
 
-      const acceptedMembers = club.members.filter(member => member.status === 'accepted');
-      const booksByMember = await Promise.all(acceptedMembers.map(async member => ({
+      const acceptedMembers = club.members.filter(
+        (member) => member.status === 'accepted'
+      );
+      const booksByMember = acceptedMembers.map((member) => ({
         member,
-        books: await listBooksForUser(member.username),
-      })));
+        books: member.books ?? [],
+      }));
 
       const options = booksByMember.flatMap(({ member, books }) =>
         books.map(book => ({
@@ -149,7 +150,6 @@ export function BookClub({ userName }) {
     await refresh();
   }
 
-  // ADD THE NEW HANDLER HERE
   async function handleInviteToExistingClub(event) {
     event.preventDefault();
 

@@ -317,12 +317,12 @@ export function Bookshelf({ userName }) {
                 <input
                   type="number"
                   id="rating"
-                  min="0"
+                  min="1"
                   max="5"
                   step="0.5"
                   value={rating}
                   onChange={(event) => setRating(event.target.value)}
-                  placeholder="Rating (0–5)"
+                  placeholder="Rating (1–5)"
                 />
               </div>
             )}
