@@ -21,6 +21,9 @@ const {
   updateBookForUser,
   deleteBookForUser,
   findBookForUser,
+  addFriendRequest,
+  getPendingFriendRequestsForUser,
+  
 } = require('./database');
 
 //old archaic data structures
@@ -404,14 +407,15 @@ apiRouter.post('/friends/requests', verifyAuth, asyncHandler(async (req, res) =>
     (request.requesterId === req.user.id && request.recipientId === recipient.id) ||
     (request.requesterId === recipient.id && request.recipientId === req.user.id);
 
-  const existing = friendRequests.find(
-    (request) =>
-      samePair(request) &&
-      ['pending', 'accepted'].includes(request.status)
+  const existing = await findActiveFriendRequestBetween(
+    req.user.id,
+    recipient.id
   );
 
   if (existing) {
-    return res.status(409).send({ msg: 'A request or friendship already exists' });
+    return res.status(409).send({
+      msg: 'A request or friendship already exists',
+    });
   }
 
   const request = {
@@ -422,17 +426,12 @@ apiRouter.post('/friends/requests', verifyAuth, asyncHandler(async (req, res) =>
     createdAt: new Date().toISOString(),
   };
 
-  friendRequests.push(request);
+  await addFriendRequest(request);
   res.status(201).send({ id: request.id, status: request.status });
 }));
 
 apiRouter.get('/friends/requests',verifyAuth,asyncHandler(async (req, res) => {
-    const requests = friendRequests.filter(
-      (request) =>
-        request.status === 'pending' &&
-        (request.requesterId === req.user.id ||
-          request.recipientId === req.user.id)
-    );
+    const requests = await getPendingFriendRequestsForUser(req.user.id);
 
     const pending = await Promise.all(
       requests.map(async (request) => {
@@ -441,7 +440,7 @@ apiRouter.get('/friends/requests',verifyAuth,asyncHandler(async (req, res) => {
           ? request.requesterId
           : request.recipientId;
 
-        const otherUser = await findUser('id', otherUserId);
+        const otherUser = await getUserById(otherUserId);
 
         return {
           id: request.id,
@@ -456,82 +455,82 @@ apiRouter.get('/friends/requests',verifyAuth,asyncHandler(async (req, res) => {
   })
 );
 
-apiRouter.patch('/friends/requests/:id', verifyAuth, (req, res) => {
-  const request = friendRequests.find(
-    (item) => item.id === req.params.id
-  );
+apiRouter.patch('/friends/requests/:id',verifyAuth,asyncHandler(async (req, res) => {
+    const request = await getFriendRequestById(req.params.id);
 
-  if (!request) {
-    return res.status(404).send({ msg: 'Request not found' });
-  }
+    if (!request) {
+      return res.status(404).send({ msg: 'Request not found' });
+    }
 
-  if (request.recipientId !== req.user.id) {
-    return res.status(403).send({ msg: 'Only the recipient can respond' });
-  }
+    if (request.recipientId !== req.user.id) {
+      return res.status(403).send({ msg: 'Only the recipient can respond' });
+    }
 
-  if (request.status !== 'pending') {
-    return res.status(409).send({ msg: 'Request is no longer pending' });
-  }
+    if (request.status !== 'pending') {
+      return res.status(409).send({ msg: 'Request is no longer pending' });
+    }
 
-  const { action } = req.body;
+    const { action } = req.body;
 
-  if (!['accept', 'decline'].includes(action)) {
-    return res.status(400).send({ msg: 'Action must be accept or decline' });
-  }
+    if (!['accept', 'decline'].includes(action)) {
+      return res.status(400).send({ msg: 'Action must be accept or decline' });
+    }
 
-  request.status = action === 'accept' ? 'accepted' : 'declined';
-  res.send({ id: request.id, status: request.status });
-});
+    const status = action === 'accept' ? 'accepted' : 'declined';
+    const result = await updateFriendRequestStatus(
+      request.id,
+      req.user.id,
+      status
+    );
 
-apiRouter.get('/friends', verifyAuth, (req, res) => {
-  const friends = friendRequests
-    .filter(
-      (request) =>
-        request.status === 'accepted' &&
-        (request.requesterId === req.user.id ||
-          request.recipientId === req.user.id)
-    )
-    .map((request) => {
-      const friendId =
-        request.requesterId === req.user.id
-          ? request.recipientId
-          : request.requesterId;
+    if (result.modifiedCount === 0) {
+      return res.status(409).send({ msg: 'Request is no longer pending' });
+    }
 
-      const friend = findUser('id', friendId);
-      return friend && { id: friend.id, username: friend.username };
-    })
-    .filter(Boolean);
+    res.send({ id: request.id, status });
+  })
+);
 
-  res.send(friends);
-});
+apiRouter.get('/friends',verifyAuth,asyncHandler(async (req, res) => {
+    const requests = await getAcceptedFriendRequestsForUser(req.user.id);
 
-apiRouter.get('/friends/:username/books', verifyAuth, asyncHandler(async (req, res) => {
-  const username = req.params.username.toLowerCase();
-  const friend = findUser('username', username);
+    const friends = await Promise.all(
+      requests.map(async (request) => {
+        const friendId =
+          request.requesterId === req.user.id
+            ? request.recipientId
+            : request.requesterId;
 
-  if (!friend) {
-    return res.status(404).send({ msg: 'User not found' });
-  }
+        const friend = await getUserById(friendId);
+        return friend ? { id: friend.id, username: friend.username } : null;
+      })
+    );
 
-  const isFriend = friendRequests.some(
-    (request) =>
-      request.status === 'accepted' &&
-      (
-        (request.requesterId === req.user.id &&
-          request.recipientId === friend.id) ||
-        (request.requesterId === friend.id &&
-          request.recipientId === req.user.id)
-      )
-  );
+    res.send(friends.filter(Boolean));
+  })
+);
 
-  if (!isFriend) {
-    return res.status(403).send({ msg: 'You are not friends with this user' });
-  }
+apiRouter.get('/friends/:username/books',verifyAuth,asyncHandler(async (req, res) => {
+    const username = req.params.username.toLowerCase();
+    const friend = await findUser('username', username);
 
-  const friendBooks = await getBooksForUser(friend.id);
+    if (!friend) {
+      return res.status(404).send({ msg: 'User not found' });
+    }
 
-  res.send(friendBooks);
-}));
+    const friendship = await findAcceptedFriendshipBetween(
+      req.user.id,
+      friend.id
+    );
+
+    if (!friendship) {
+      return res.status(403).send({ msg: 'You are not friends with this user' });
+    }
+
+    const friendBooks = await getBooksForUser(friend.id);
+    res.send(friendBooks);
+  })
+);
 
 app.use(`/api`, apiRouter);
 // Return a JSON 404 for unknown API endpoints.

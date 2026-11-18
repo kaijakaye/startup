@@ -78,10 +78,6 @@ async function addFriendRequest(request) {
   return friendRequestCollection.insertOne(request);
 }
 
-async function getFriendRequestsForUser(userId) {
-  return friendRequestCollection.find({ $or: [{ requesterId: userId }, { recipientId: userId }] }).toArray();
-}
-
 async function findActiveFriendRequestBetween(userA, userB) {
   return friendRequestCollection.findOne({
     status: { $in: ['pending', 'accepted'] },
@@ -134,5 +130,12 @@ module.exports = {
   getUserById,
   updateBookForUser,
   deleteBookForUser,
-  findBookForUser
+  findBookForUser,
+  addFriendRequest,
+  findActiveFriendRequestBetween,
+  findAcceptedFriendshipBetween,
+  getFriendRequestById,
+  getPendingFriendRequestsForUser,
+  getAcceptedFriendRequestsForUser,
+  updateFriendRequestStatus,
 };
