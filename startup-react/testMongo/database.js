@@ -118,6 +118,33 @@ async function updateFriendRequestStatus(id, recipientId, status) {
   return friendRequestCollection.updateOne({ id, recipientId, status: 'pending' }, { $set: { status } });
 }
 
+async function addClub(club) {
+  return clubCollection.insertOne(club);
+}
+
+async function getClubById(clubId) {
+  return clubCollection.findOne({ id : clubId });
+}
+
+async function getClubMembership(clubId, userId) {
+  return clubMemberCollection.findOne({ clubId, userId });
+}
+
+async function getClubMembershipsForUser(userId) {
+  return clubMemberCollection.find({ userId }).toArray();
+}
+
+async function addClubMembership(membership) {
+  return clubMemberCollection.insertOne(membership);
+}
+
+async function updateClubMembership(clubId, userId, updates) {
+  return clubMemberCollection.updateOne(
+    { clubId, userId },
+    { $set: updates }
+  );
+}
+
 module.exports = {
   getUser,
   getUserByToken,
@@ -138,4 +165,10 @@ module.exports = {
   getPendingFriendRequestsForUser,
   getAcceptedFriendRequestsForUser,
   updateFriendRequestStatus,
+  addClub,
+  getClubById,
+  getClubMembership,
+  getClubMembershipsForUser,
+  addClubMembership,
+  updateClubMembership,
 };
