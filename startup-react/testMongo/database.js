@@ -63,7 +63,13 @@ async function addBookForUser(userId, book) {
 }
 
 async function updateBookForUser(userId, bookId, updates) {
-  return bookCollection.updateOne({ id: bookId, userId }, { $set: updates });
+  const result = await bookCollection.updateOne(
+    { id: bookId, userId },
+    { $set: updates }
+  );
+
+  if (result.matchedCount === 0) return null;
+  return findBookForUser(userId, bookId);
 }
 
 async function deleteBookForUser(userId, bookId) {
@@ -134,6 +140,10 @@ async function getClubMembershipsForUser(userId) {
   return clubMemberCollection.find({ userId }).toArray();
 }
 
+async function getClubMembershipsForClub(clubId) {
+  return clubMemberCollection.find({ clubId }).toArray();
+}
+
 async function addClubMembership(membership) {
   return clubMemberCollection.insertOne(membership);
 }
@@ -142,6 +152,13 @@ async function updateClubMembership(clubId, userId, updates) {
   return clubMemberCollection.updateOne(
     { clubId, userId },
     { $set: updates }
+  );
+}
+
+async function updateClubCurrentBook(clubId, currentBook) {
+  return clubCollection.updateOne(
+    { id: clubId },
+    { $set: { currentBook } }
   );
 }
 
@@ -171,4 +188,6 @@ module.exports = {
   getClubMembershipsForUser,
   addClubMembership,
   updateClubMembership,
+  getClubMembershipsForClub,
+  updateClubCurrentBook,
 };

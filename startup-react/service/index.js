@@ -33,6 +33,9 @@ const {
   getFriendRequestById,
   getAcceptedFriendRequestsForUser,
   updateFriendRequestStatus,
+  findActiveFriendRequestBetween,
+  updateClubCurrentBook,
+  getClubMembershipsForClub,
 } = require('./database');
 
 // The service port. In production the front-end code is statically hosted by the service on the same port.
@@ -224,6 +227,90 @@ apiRouter.get('/clubs',verifyAuth,asyncHandler(async (req, res) => {
     res.send(myClubs.filter(Boolean));
   })
 );
+
+apiRouter.get('/clubs/:id', verifyAuth, asyncHandler(async (req, res) => {
+  const club = await getClubById(req.params.id);
+
+  if (!club) {
+    return res.status(404).send({ msg: 'Club not found' });
+  }
+
+  const viewerMembership = await getClubMembership(club.id, req.user.id);
+  if (viewerMembership?.status !== 'accepted') {
+    return res.status(403).send({ msg: 'Join the club to view its details' });
+  }
+
+  const memberships = await getClubMembershipsForClub(club.id);
+  const visibleMemberships = memberships.filter((membership) =>
+    ['accepted', 'pending'].includes(membership.status)
+  );
+
+  const members = await Promise.all(visibleMemberships.map(async (membership) => {
+    const memberUser = await getUserById(membership.userId);
+    const memberBooks = membership.status === 'accepted'
+      ? await getBooksForUser(membership.userId)
+      : [];
+
+    return {
+      userId: membership.userId,
+      username: memberUser?.username ?? 'Unknown user',
+      displayName: memberUser?.username ?? 'Unknown user',
+      status: membership.status,
+      role: membership.role,
+      books: memberBooks.map(({ _id, userId, ...book }) => book),
+    };
+  }));
+
+  const { _id, ...clubData } = club;
+  res.send({ ...clubData, members });
+}));
+
+apiRouter.post('/clubs/:id/reads', verifyAuth, asyncHandler(async (req, res) => {
+  const club = await getClubById(req.params.id);
+
+  if (!club) {
+    return res.status(404).send({ msg: 'Club not found' });
+  }
+
+  const callerMembership = await getClubMembership(club.id, req.user.id);
+  if (callerMembership?.status !== 'accepted') {
+    return res.status(403).send({ msg: 'Join the club to choose its read' });
+  }
+
+  const { book } = req.body;
+  if (!book || typeof book.bookId !== 'string' ||
+      typeof book.sourceUserId !== 'string') {
+    return res.status(400).send({ msg: 'A member book is required' });
+  }
+
+  const sourceMembership = await getClubMembership(club.id, book.sourceUserId);
+  if (sourceMembership?.status !== 'accepted') {
+    return res.status(403).send({
+      msg: 'The book must belong to an accepted club member',
+    });
+  }
+
+  const sourceBook = await findBookForUser(book.sourceUserId, book.bookId);
+  if (!sourceBook) {
+    return res.status(404).send({
+      msg: 'Book not found on that member’s shelf',
+    });
+  }
+
+  const currentBook = {
+    bookId: sourceBook.id,
+    sourceUserId: book.sourceUserId,
+    title: sourceBook.title,
+    author: sourceBook.author ?? '',
+  };
+
+  const result = await updateClubCurrentBook(club.id, currentBook);
+  if (result.matchedCount === 0) {
+    return res.status(404).send({ msg: 'Club not found' });
+  }
+
+  res.send({ clubId: club.id, currentBook });
+}));
 
 // Invite an accepted friend to a club.
 apiRouter.post('/clubs/:id/invites',verifyAuth,asyncHandler(async (req, res) => {

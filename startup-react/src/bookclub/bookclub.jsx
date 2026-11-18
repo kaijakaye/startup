@@ -181,12 +181,6 @@ export function BookClub({ userName }) {
     await refresh();
   }
 
-  async function handleInviteResponse(clubId, accepted) {
-    await respondToClubInvite(clubId, userName, accepted);
-    if (accepted) setActiveClubId(clubId);
-    await refresh();
-  }
-
   async function handleSetBook(event) {
     event.preventDefault();
     const option = bookOptions.find(item => item.optionId === selectedBook);
